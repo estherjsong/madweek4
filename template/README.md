@@ -1,108 +1,70 @@
-# Berry Free React Material Admin Template [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Get%20Berry%20React%20-%20The%20most%20beautiful%20Material%20designed%20Admin%20Dashboard%20Template%20&url=https://berrydashboard.io&via=codedthemes&hashtags=reactjs,webdev,developers,javascript)
+# Getting Started with Create React App
 
-[![Price](https://img.shields.io/badge/price-FREE-0098f7.svg)](https://github.com/codedthemes/berry-free-react-admin-template/blob/main/LICENSE)
-[![npm](https://img.shields.io/npm/v/froala-design-blocks.svg?colorB=brightgreen)](https://www.npmjs.com/package/berry-material-react-free)
-[![GitHub package version](https://img.shields.io/github/package-json/v/froala/design-blocks.svg)](https://github.com/codedthemes/berry-free-react-admin-template/)
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Available Scripts
 
-Berry is a creative free react admin template build using the Material-UI. It is meant to be the best User Experience with highly customizable feature-riched pages. It is a complete game-changer React Dashboard Template with easy and intuitive responsive design as on retina screens or laptops.
+In the project directory, you can run:
 
-<a href="https://www.producthunt.com/posts/berry-free-react-admin-template?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-berry-free-react-admin-template" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=295529&theme=dark" alt="Berry - Free React Admin Template - Help you to create React web applications faster & beautiful | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+### `npm start`
 
-[Pro version](https://berrydashboard.io) of Berry react template contains features like TypeScript, Apps, Authentication Methods (i.e. JWT, Auth0, Firebase), Advance Components, Form Plugins, Layouts, Widgets, and many more.
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-![Berry React Material Admin Template](https://blog.berrydashboard.io/content/images/size/w1000/2021/04/Og-Blog-social.png)
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
-## Why Berry?
+### `npm test`
 
-Berry brings everything you need for dashboard development. We have added the following high-end features in the initial release.
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
- * Modern aesthetics UI design
- * Material-UI components
- * Fully Responsive, all modern browser supported
- * Easy to use code structure
- * Flexible & High-Performance code
- * Easy Documentation Guide
+### `npm run build`
 
-## Free version preview & download
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-We are expected to release the Free Berry React Admin Template in 07/05/2021
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-#### Preview
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
- - [Demo](https://berrydashboard.io/free)
+### `npm run eject`
 
-#### Download
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
- - [Download from Github](https://github.com/codedthemes/berry-free-react-admin-template)
- 
-## Pro version preview & Purchase
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Berry is available to purchase.
-#### Preview
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
- - [Demo](https://berrydashboard.io)
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-#### Purchase
+## Learn More
 
- - [Purchase from Material UI Store](https://material-ui.com/store/items/berry-react-material-admin/)
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-## Table of contents
+To learn React, check out the [React documentation](https://reactjs.org/).
 
- * [Getting Started](#getting-started)
- * [Documentation](#documentation)
- * [Technology Stack](#technology-stack)
- * [Author](#author)
- * [Issues?](#issues)
- * [License](#license)
- * [More Products](#more-free-react-material-admin-templates)
- * [Follow us](#follow-us)
- 
-## Getting Started
+### Code Splitting
 
-Clone from Github 
-```
-git clone https://github.com/codedthemes/berry-free-react-admin-template.git
-```
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-## Documentation
+### Analyzing the Bundle Size
 
-Berry documentation helps you out in all aspects from Installation to deployment - Soon it will be available.
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-## Technology Stack
+### Making a Progressive Web App
 
- - [Material UI V5](https://material-ui.com/)
- - Built with React Hooks API
- - Redux & React Context API for State Management
- - React Router for Navigation Routing
- - Support of react-script
- - Code Splitting
- - CSS-in-JS where CSS is composed using JavaScript instead of defined in external files
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
 
-## Author
+### Advanced Configuration
 
-Berry is managed by Team [CodedThemes](https://codedthemes.com).
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
-## Issues
+### Deployment
 
-Please generate a Github issue if you found a bug in any version. We are trying to be responsive to resolve the issue.
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
-## License
+### `npm run build` fails to minify
 
- - Licensed cover under [MIT](https://github.com/codedthemes/datta-able-bootstrap-dashboard/blob/master/LICENSE)
-
-## More Free React Material Admin Templates
-
- - [Free Materially](https://codedthemes.com/item/materially-free-reactjs-admin-template/)
-
-## More Premium React Material Admin Templates
-
- - [Materially](https://codedthemes.com/item/materially-reactjs-admin-dashboard/)
- 
-## Follow us
- - Website [https://berrydashboard.io](https://berrydashboard.io)
- - Blog [https://blog.berrydashboard.io](https://blog.berrydashboard.io)
- - CodedThemes [https://codedthemes.com](https://codedthemes.com)
- - Dribbble [https://dribbble.com/codedthemes](https://dribbble.com/codedthemes)
- - Facebook [https://www.facebook.com/codedthemes](https://www.facebook.com/codedthemes)
- - Twitter [https://twitter.com/codedthemes](https://twitter.com/codedthemes)
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
