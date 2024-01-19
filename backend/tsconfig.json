@@ -5,6 +5,10 @@
     "outDir": "./dist",
     "paths": {
       "@src/*": ["src/*"],
+      "@config/*": ["src/config/*"],
+      "@controllers/*": ["src/controllers/*"],
+      "@routes/*": ["src/routes/*"],
+      "@utils/*": ["src/utils/*"],
     },
   },
 }
