@@ -1,7 +1,4 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-import { isAuthenticated } from '@config/passport';
-import * as userController from '@controllers/user';
+import userController from '@controllers/user';
 import compression from 'compression';
 import connectPgSimple from 'connect-pg-simple';
 import express from 'express';
@@ -69,9 +66,6 @@ app.use(
     })
   )
 );
-
-app.post('/login', userController.postLogin);
-app.post('/logout', isAuthenticated, userController.postLogout);
-app.post('/signup', userController.postSignup);
+app.use('/', userController);
 
 export default app;

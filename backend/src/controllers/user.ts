@@ -1,19 +1,21 @@
 /**
  *  @swagger
  *  tags:
- *    name: Users
+ *    name: User
  *    description: 사용자 관리를 위한 API
  */
 
+import { isAuthenticated } from '@config/passport';
+import userRepository from '@repositories/user';
 import * as argon2 from 'argon2';
-import { count, eq } from 'drizzle-orm';
-import { type NextFunction, type Request, type Response } from 'express';
+import express from 'express';
 import { body, matchedData, validationResult } from 'express-validator';
 import passport from 'passport';
 import { type IVerifyOptions } from 'passport-local';
 
-import db from '@src/db';
-import * as schema from '@src/schema';
+import { type User } from '@src/schema';
+
+const router = express.Router();
 
 /**
  *  @swagger
@@ -50,7 +52,7 @@ import * as schema from '@src/schema';
  *   /login:
  *     post:
  *       summary: 아이디와 비밀번호로 로그인
- *       tags: [Users]
+ *       tags: [User]
  *       requestBody:
  *         required: true
  *         content:
@@ -78,14 +80,10 @@ import * as schema from '@src/schema';
  *                   user:
  *                     $ref: '#/components/schemas/User'
  */
-export const postLogin = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
+router.post('/login', (req, res, next) => {
   passport.authenticate(
     'local',
-    (error: Error, user: schema.User | false, info: IVerifyOptions) => {
+    (error: Error, user: User | false, info: IVerifyOptions) => {
       if (error != null) {
         next(error);
         return;
@@ -103,7 +101,7 @@ export const postLogin = async (
       });
     }
   )(req, res, next);
-};
+});
 
 /**
  *  @swagger
@@ -111,7 +109,7 @@ export const postLogin = async (
  *   /logout:
  *     post:
  *       summary: 로그아웃
- *       tags: [Users]
+ *       tags: [User]
  *       responses:
  *         "200":
  *           description: 로그아웃 성공 여부
@@ -124,11 +122,7 @@ export const postLogin = async (
  *                     type: boolean
  *                     description: 로그아웃 성공 여부
  */
-export const postLogout = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
+router.post('/logout', isAuthenticated, (req, res, next) => {
   req.logOut((error) => {
     if (error != null) {
       next(error);
@@ -136,7 +130,7 @@ export const postLogout = (
     }
     res.status(200).json({ success: true });
   });
-};
+});
 
 /**
  *  @swagger
@@ -144,7 +138,7 @@ export const postLogout = (
  *   /signup:
  *     post:
  *       summary: 아이디와 비밀번호로 회원가입
- *       tags: [Users]
+ *       tags: [User]
  *       requestBody:
  *         required: true
  *         content:
@@ -178,11 +172,7 @@ export const postLogout = (
  *                   user:
  *                     $ref: '#/components/schemas/User'
  */
-export const postSignup = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
+router.post('/signup', async (req, res, next) => {
   await body('userId', '아이디는 6-12자 이내의 영문/숫자만 사용 가능합니다.')
     .trim()
     .isLength({ min: 6, max: 12 })
@@ -217,24 +207,14 @@ export const postSignup = async (
   const data: Record<string, string> = matchedData(req);
 
   try {
-    const duplicateUserId = await db
-      .select({ value: count() })
-      .from(schema.users)
-      .where(eq(schema.users.userId, data.userId));
-
-    if (duplicateUserId[0].value > 0) {
+    if ((await userRepository.countUserId(data.userId)) > 0) {
       res
         .status(400)
         .json({ success: false, message: '이미 존재하는 아이디입니다.' });
       return;
     }
 
-    const duplicateNickname = await db
-      .select({ value: count() })
-      .from(schema.users)
-      .where(eq(schema.users.nickname, data.nickname));
-
-    if (duplicateNickname[0].value > 0) {
+    if ((await userRepository.countNickname(data.nickname)) > 0) {
       res
         .status(400)
         .json({ success: false, message: '이미 존재하는 닉네임입니다.' });
@@ -242,15 +222,11 @@ export const postSignup = async (
     }
 
     const hash = await argon2.hash(data.password);
-    const result = await db
-      .insert(schema.users)
-      .values({
-        userId: data.userId,
-        password: hash,
-        nickname: data.nickname,
-      })
-      .returning();
-    const user = result[0];
+    const user: User = await userRepository.createUser(
+      data.userId,
+      hash,
+      data.nickname
+    );
     req.logIn(user, (error) => {
       if (error != null) {
         next(error);
@@ -261,4 +237,6 @@ export const postSignup = async (
   } catch (error) {
     next(error);
   }
-};
+});
+
+export default router;
