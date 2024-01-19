@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { isAuthenticated } from '@config/passport';
 import * as userController from '@controllers/user';
 import compression from 'compression';
@@ -8,6 +9,8 @@ import session from 'express-session';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import passport from 'passport';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUI from 'swagger-ui-express';
 
 import logger from '@utils/logger';
 import { ENVIRONMENT, POSTGRES_URL, SESSION_SECRET } from '@utils/secret';
@@ -49,6 +52,23 @@ app.use(
 );
 app.use(session(sess));
 app.use(passport.authenticate('session'));
+
+app.use(
+  '/api-docs',
+  swaggerUI.serve,
+  swaggerUI.setup(
+    swaggerJsdoc({
+      definition: {
+        openapi: '3.0.0',
+        info: {
+          title: 'Madcamp Week4',
+          version: '1.0.0',
+        },
+      },
+      apis: ['./src/controllers/*.ts'],
+    })
+  )
+);
 
 app.post('/login', userController.postLogin);
 app.post('/logout', isAuthenticated, userController.postLogout);

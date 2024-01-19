@@ -27,8 +27,14 @@
         }
       }
     ],
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": [".*"]
+      }
+    ],
     "sort-imports": [
-      "error",
+      "warn",
       {
         "ignoreDeclarationSort": true
       }
