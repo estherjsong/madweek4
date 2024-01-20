@@ -63,13 +63,7 @@ const router = express.Router();
  *           content:
  *             application/json:
  *               schema:
- *                 type: object
- *                 properties:
- *                   success:
- *                     type: boolean
- *                     description: 로그인 성공 여부
- *                   user:
- *                     $ref: '#/components/schemas/User'
+ *                 $ref: '#/components/schemas/User'
  *         "400":
  *           description: 로그인 오류
  *           content:
@@ -77,10 +71,6 @@ const router = express.Router();
  *               schema:
  *                 type: object
  *                 properties:
- *                   success:
- *                     type: boolean
- *                     default: false
- *                     description: 로그인 성공 여부
  *                   message:
  *                     type: string
  *                     desciprtion: 오류 메시지
@@ -101,10 +91,6 @@ router.post('/login', userController.postLogin);
  *             application/json:
  *               schema:
  *                 type: object
- *                 properties:
- *                   success:
- *                     type: boolean
- *                     description: 로그아웃 성공 여부
  */
 router.post('/logout', isAuthenticated, userController.postLogout);
 
@@ -140,13 +126,7 @@ router.post('/logout', isAuthenticated, userController.postLogout);
  *           content:
  *             application/json:
  *               schema:
- *                 type: object
- *                 properties:
- *                   success:
- *                     type: boolean
- *                     description: 회원가입 성공 여부
- *                   user:
- *                     $ref: '#/components/schemas/User'
+ *                 $ref: '#/components/schemas/User'
  *         "400":
  *           description: 회원가입 오류
  *           content:
@@ -154,10 +134,6 @@ router.post('/logout', isAuthenticated, userController.postLogout);
  *               schema:
  *                 type: object
  *                 properties:
- *                   success:
- *                     type: boolean
- *                     default: false
- *                     description: 회원가입 성공 여부
  *                   message:
  *                     type: string
  *                     desciprtion: 오류 메시지

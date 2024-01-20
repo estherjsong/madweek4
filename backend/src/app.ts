@@ -21,7 +21,7 @@ const sess: session.SessionOptions = {
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: {},
+  cookie: { httpOnly: true, secure: true },
   store: new PostgresqlStore({
     conString: POSTGRES_URL,
     createTableIfMissing: true,
@@ -30,7 +30,8 @@ const sess: session.SessionOptions = {
 
 if (ENVIRONMENT === 'production') {
   app.set('trust proxy', 1);
-  sess.cookie!.secure = true;
+} else {
+  sess.cookie!.sameSite = 'none';
 }
 
 app.set('port', process.argv[2] ?? 3000);
@@ -52,9 +53,11 @@ app.use(
   )
 );
 
-app.use(helmet());
+if (ENVIRONMENT === 'production') {
+  app.use(helmet());
+}
 app.use(compression());
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(

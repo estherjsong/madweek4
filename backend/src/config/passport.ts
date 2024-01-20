@@ -1,5 +1,5 @@
 import * as argon2 from 'argon2';
-import { type NextFunction, type Request, type Response } from 'express';
+import { type RequestHandler } from 'express';
 import passport from 'passport';
 import passportLocal from 'passport-local';
 
@@ -63,16 +63,10 @@ passport.use(
   )
 );
 
-export const isAuthenticated = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
+export const isAuthenticated: RequestHandler = (req, res, next) => {
   if (req.isAuthenticated()) {
     next();
     return;
   }
-  res
-    .status(401)
-    .json({ success: false, message: '로그인을 하지 않았습니다.' });
+  res.status(401).json({ message: '로그인을 하지 않았습니다.' });
 };
