@@ -67,6 +67,7 @@ const RegisterForm = ({ isVisible, onClose, onLog }) => {
                     headers: {
                         'Content-Type': 'application/json',
                     },
+                    credentials: 'include',
                     body: JSON.stringify(formData),
                 });
 

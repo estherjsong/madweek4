@@ -29,7 +29,8 @@ const LogoutForm = ({ isVisible, onClose }) => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                }
+                },
+                credentials: 'include',
             });
 
             const result = await response.json();

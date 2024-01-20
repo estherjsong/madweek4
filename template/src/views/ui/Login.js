@@ -51,6 +51,10 @@ const LoginForm = ({ isVisible, onClose, onReg }) => {
         // Validate the form
         const isValid = validateForm();
 
+
+        // localStorage.setItem('nickname', 'aaa')
+        // console.log(localStorage.getItem('nickname'))
+
         // If the form is valid, proceed with form submission
         if (isValid) {
             // Perform your form submission logic here
@@ -61,6 +65,7 @@ const LoginForm = ({ isVisible, onClose, onReg }) => {
                     headers: {
                         'Content-Type': 'application/json',
                     },
+                    credentials: 'include',
                     body: JSON.stringify(formData),
                 });
 
@@ -72,18 +77,15 @@ const LoginForm = ({ isVisible, onClose, onReg }) => {
                     // 로그인이 성공한 경우
                     console.log('Login successful - result:', result);
 
-                    // 여기에서 result에 있는 정보를 활용하여 필요한 작업을 수행할 수 있습니다.
-                    const { success, user } = result;
-                    if (success) {
-                        console.log("login success - user", user)
+                    localStorage.setItem('userId', result.userId)
+                    localStorage.setItem('nickname', result.nickname)
 
-                        // 원하는 작업 수행
-                        localStorage.setItem('userId', user.userId)
-                        localStorage.setItem('nickname', user.nickname)
-                    }
+                    // cookie.save('userId',result.userId, {
+                    //     path: '/',
+                    // })
 
                     onClose();
-                    window.location.reload();
+                    // window.location.reload();
 
                 } else {
                     // 로그인이 실패한 경우
