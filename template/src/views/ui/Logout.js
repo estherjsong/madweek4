@@ -12,41 +12,51 @@ import {
     FormText,
 } from "reactstrap";
 import React, { useState } from 'react';
-
+import { API_BASE_URL } from "../../config";
 import { BackgroundOverlay } from '../../components/CommonStyles';
 
-const LogoutForm = ({ isVisible, onClose, logout }) => {
-    const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-    });
-
-    const [errors, setErrors] = useState({});
-
-    // Validation function
-    const validateForm = () => {
-        const newErrors = {};
-
-        // Validate email
-        if (!formData.email) {
-            newErrors.email = 'Email is required';
-        }
-
-        // Validate password
-        if (!formData.password) {
-            newErrors.password = 'Password is required';
-        }
-
-        // Set errors state
-        setErrors(newErrors);
-
-        // Return true if no errors, false otherwise
-        return Object.keys(newErrors).length === 0;
-    };
+const LogoutForm = ({ isVisible, onClose }) => {
 
     // Submit function
-    const handleLogout = (e) => {
-        logout()
+    const handleLogout = async (e) => {
+        localStorage.removeItem('userId');
+        localStorage.removeItem('nickname');
+        localStorage.clear();
+
+        try {
+            // Perform your form submission logic here
+            const response = await fetch(`${API_BASE_URL}/logout`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            const result = await response.json();
+
+            console.log("response", response)
+
+            if (response.ok) {
+                // 로그인이 성공한 경우
+                console.log('Logout successful - result:', result);
+
+                // 여기에서 result에 있는 정보를 활용하여 필요한 작업을 수행할 수 있습니다.
+                const { success } = result;
+                if (success) {
+                    console.log("logout success")
+                }
+
+                onClose();
+            } else {
+                // 로그인이 실패한 경우
+                console.log('Logout failed:', result);
+                // 여기에서 적절한 에러 처리를 수행할 수 있습니다.
+            }
+        } catch (error) {
+            console.error('An error occurred during login:', error);
+            // 여기에서 적절한 에러 처리를 수행할 수 있습니다.
+        }
+
         onClose()
         window.location.reload();
     };

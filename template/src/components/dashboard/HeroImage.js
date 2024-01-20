@@ -22,8 +22,8 @@ export default function HeroImage() {
                             <h1 className='mb-3'>Website Name</h1>
                             <h4 className='mb-3'>Catchphrase</h4>
                             <Button className="btn" outline color="primary">
-                                Register
-                                <i class="bi bi-arrow-right">  </i>
+                                Go to ask  question 
+                                <i class="bi bi-arrow-right"></i>
                             </Button>
                         </div>
                     </div>

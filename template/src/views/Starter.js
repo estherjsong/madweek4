@@ -1,9 +1,8 @@
 import { Col, Row } from "reactstrap";
-import SalesChart from "../components/dashboard/SalesChart";
-import Feeds from "../components/dashboard/Feeds";
-import ProjectTables from "../components/dashboard/ProjectTable";
+import SolvedChart from "../components/dashboard/SolvedChart";
+import ScoreTable from "../components/dashboard/ScoreTable";
+import ActiveQuestions from "../components/dashboard/ActiveQuestions";
 
-import Blog from "../components/dashboard/Blog";
 import bg1 from "../assets/images/bg/bg1.jpg";
 import bg2 from "../assets/images/bg/bg2.jpg";
 import bg3 from "../assets/images/bg/bg3.jpg";
@@ -48,8 +47,6 @@ const BlogData = [
 const Starter = () => {
   return (
     <div>
-      {/***Top Cards***/}
-
       {/***Sales & Feed***/}
       <Row>
         <Col lg="12">
@@ -57,32 +54,18 @@ const Starter = () => {
         </Col>
       </Row>
       <Row>
-        <Col lg="12">
-          <SalesChart />
+        <Col sm="6" lg="6" xl="7" xxl="8" className="h-100">
+          <SolvedChart />
         </Col>
-        {/* <Col sm="6" lg="6" xl="5" xxl="4">
-          <Feeds />
-        </Col> */}
+        <Col sm="6" lg="6" xl="5" xxl="4" className="h-100">
+          <ScoreTable />
+        </Col>
       </Row>
       {/***Table ***/}
       <Row>
         <Col lg="12">
-          <ProjectTables />
+          <ActiveQuestions />
         </Col>
-      </Row>
-      {/***Blog Cards***/}
-      <Row>
-        {BlogData.map((blg, index) => (
-          <Col sm="6" lg="6" xl="3" key={index}>
-            <Blog
-              image={blg.image}
-              title={blg.title}
-              subtitle={blg.subtitle}
-              text={blg.description}
-              color={blg.btnbg}
-            />
-          </Col>
-        ))}
       </Row>
     </div>
   );

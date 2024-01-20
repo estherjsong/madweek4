@@ -13,6 +13,17 @@ const navigation = [
     icon: "bi bi-bell",
   },
   {
+    title: "All Questions",
+    href: "/",
+    icon: "bi bi-card-list",
+  },
+  {
+    title: "Ask Questions",
+    href: "/ask",
+    icon: "bi bi-plus-circle",
+  },
+  ///////////////////////////////////////////////////////
+  {
     title: "Badges",
     href: "/badges",
     icon: "bi bi-patch-check",

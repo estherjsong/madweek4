@@ -1,7 +1,7 @@
 import { Card, CardBody, CardSubtitle, CardTitle, Row, Col } from "reactstrap";
 import Chart from "react-apexcharts";
 
-const SalesChart = () => {
+const SolvedChart = () => {
   const options = {
     chart: {
       toolbar: {
@@ -69,9 +69,9 @@ const SalesChart = () => {
   return (
     <Card>
       <CardBody>
-        <CardTitle tag="h5">Sales Summary</CardTitle>
+        <CardTitle tag="h5">Site Summary</CardTitle>
         <CardSubtitle className="text-muted" tag="h6">
-          Yearly Sales Report
+          How many have been solved by users
         </CardSubtitle>
         <div className="bg-primary text-white my-3 p-3 rounded">
           <Row>
@@ -89,10 +89,10 @@ const SalesChart = () => {
             </Col>
           </Row>
         </div>
-        <Chart options={options} series={series} type="area" height="279" />
+        <Chart options={options} series={series} type="area" height="335" />
       </CardBody>
     </Card>
   );
 };
 
-export default SalesChart;
+export default SolvedChart;

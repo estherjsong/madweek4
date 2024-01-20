@@ -12,12 +12,12 @@ import {
     FormText,
 } from "reactstrap";
 import React, { useState } from 'react';
-
-import { BackgroundOverlay} from '../../components/CommonStyles';
+import { API_BASE_URL } from "../../config";
+import { BackgroundOverlay } from '../../components/CommonStyles';
 
 const LoginForm = ({ isVisible, onClose, onReg }) => {
     const [formData, setFormData] = useState({
-        email: '',
+        userId: '',
         password: '',
     });
 
@@ -27,9 +27,9 @@ const LoginForm = ({ isVisible, onClose, onReg }) => {
     const validateForm = () => {
         const newErrors = {};
 
-        // Validate email
-        if (!formData.email) {
-            newErrors.email = 'Email is required';
+        // Validate userId
+        if (!formData.userId) {
+            newErrors.userId = 'ID is required';
         }
 
         // Validate password
@@ -45,7 +45,7 @@ const LoginForm = ({ isVisible, onClose, onReg }) => {
     };
 
     // Submit function
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
 
         // Validate the form
@@ -54,10 +54,71 @@ const LoginForm = ({ isVisible, onClose, onReg }) => {
         // If the form is valid, proceed with form submission
         if (isValid) {
             // Perform your form submission logic here
-            console.log('Form submitted:', formData);
-            onClose();
+            try {
+                // Perform your form submission logic here
+                const response = await fetch(`${API_BASE_URL}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                const result = await response.json();
+
+                console.log("response", response)
+
+                if (response.ok) {
+                    // 로그인이 성공한 경우
+                    console.log('Login successful - result:', result);
+
+                    // 여기에서 result에 있는 정보를 활용하여 필요한 작업을 수행할 수 있습니다.
+                    const { success, user } = result;
+                    if (success) {
+                        console.log("login success - user", user)
+
+                        // 원하는 작업 수행
+                        localStorage.setItem('userId', user.userId)
+                        localStorage.setItem('nickname', user.nickname)
+                    }
+
+                    onClose();
+                    window.location.reload();
+
+                } else {
+                    // 로그인이 실패한 경우
+                    console.log('Login failed:', result);
+                    // 여기에서 적절한 에러 처리를 수행할 수 있습니다.
+
+                    const newErrors = {};
+                    switch (result.error) {
+                        case '존재하지 않는 아이디입니다.':
+                            newErrors.userId = 'This ID does not exist.';
+                            break;
+                        case '비밀번호가 일치하지 않습니다.':
+                            newErrors.password = 'Passwords do not match.';
+                            break;
+                        default:
+                            // 처리하고자 하는 에러 메시지가 없을 경우 아무 작업도 하지 않음
+                            break;
+                    }
+                    console.log(newErrors);
+                    setErrors(newErrors);
+                }
+            } catch (error) {
+                console.error('An error occurred during login:', error);
+                // 여기에서 적절한 에러 처리를 수행할 수 있습니다.
+            }
         } else {
             console.log('Form validation failed');
+        }
+    };
+
+    // Handle key press event
+    const handleKeyPress = (e) => {
+        // 엔터 키를 눌렀을 때 handleLogin 함수 호출
+        if (e.key === 'Enter') {
+            handleLogin(e);
         }
     };
 
@@ -80,16 +141,17 @@ const LoginForm = ({ isVisible, onClose, onReg }) => {
                 <CardBody>
                     <Form>
                         <FormGroup>
-                            <Label for="email">Email</Label>
+                            <Label for="userId">ID</Label>
                             <Input
-                                id="email"
-                                name="email"
-                                placeholder="email"
-                                type="email"
-                                value={formData.email}
+                                id="userId"
+                                name="userId"
+                                placeholder="userId"
+                                type="text"
+                                value={formData.ID}
                                 onChange={handleChange}
+                                onKeyPress={handleKeyPress}
                             />
-                            {errors.email && <div className="text-danger">{errors.email}</div>}
+                            {errors.userId && <div className="text-danger">{errors.userId}</div>}
                         </FormGroup>
                         <FormGroup>
                             <Label for="password">Password</Label>
@@ -100,12 +162,13 @@ const LoginForm = ({ isVisible, onClose, onReg }) => {
                                 type="password"
                                 value={formData.password}
                                 onChange={handleChange}
+                                onKeyPress={handleKeyPress}
                             />
                             {errors.password && <div className="text-danger">{errors.password}</div>}
                         </FormGroup>
-                        
-                        <Button onClick={handleLogin} className="btn" color="secondary" style={{width: '100%', marginBottom: '10px'}}>Login</Button>
-                        <Button onClick={onReg} className="btn" outline color="secondary" style={{width: '100%'}}>Register</Button>
+
+                        <Button onClick={handleLogin} className="btn" color="secondary" style={{ width: '100%', marginBottom: '10px' }}>Login</Button>
+                        <Button onClick={onReg} className="btn" outline color="secondary" style={{ width: '100%' }}>Register</Button>
                     </Form>
                 </CardBody>
             </Card>
