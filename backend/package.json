@@ -6,7 +6,7 @@
   "scripts": {
     "build:pg": "drizzle-kit generate:pg --schema src/schema.ts",
     "build:ts": "tsc && tsc-alias",
-    "build": "npm run build:pg && npm run build:ts",
+    "build": "npm run build:ts",
     "start": "node dist/server.js",
     "dev": "npm run build:pg && nodemon -r tsconfig-paths/register src/server.ts 8080"
   },
