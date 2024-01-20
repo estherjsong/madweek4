@@ -18,10 +18,6 @@ const router = express.Router();
  *    schemas:
  *      User:
  *        type: object
- *        required:
- *          - userId
- *          - password
- *          - nickname
  *        properties:
  *          id:
  *            type: integer
@@ -74,6 +70,20 @@ const router = express.Router();
  *                     description: 로그인 성공 여부
  *                   user:
  *                     $ref: '#/components/schemas/User'
+ *         "400":
+ *           description: 로그인 오류
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: boolean
+ *                     default: false
+ *                     description: 로그인 성공 여부
+ *                   message:
+ *                     type: string
+ *                     desciprtion: 오류 메시지
  */
 router.post('/login', userController.postLogin);
 
@@ -125,7 +135,7 @@ router.post('/logout', isAuthenticated, userController.postLogout);
  *                   type: string
  *                   description: 가입할 유저 닉네임
  *       responses:
- *         "200":
+ *         "201":
  *           description: 회원가입한 유저
  *           content:
  *             application/json:
@@ -137,6 +147,20 @@ router.post('/logout', isAuthenticated, userController.postLogout);
  *                     description: 회원가입 성공 여부
  *                   user:
  *                     $ref: '#/components/schemas/User'
+ *         "400":
+ *           description: 회원가입 오류
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: boolean
+ *                     default: false
+ *                     description: 회원가입 성공 여부
+ *                   message:
+ *                     type: string
+ *                     desciprtion: 오류 메시지
  */
 router.post('/signup', userController.postSignup);
 

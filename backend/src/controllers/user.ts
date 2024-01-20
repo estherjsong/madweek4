@@ -17,7 +17,7 @@ class UserController {
           return;
         }
         if (user === false) {
-          res.status(400).json({ success: false, error: info.message });
+          res.status(400).json({ success: false, message: info.message });
           return;
         }
         req.logIn(user, (error) => {
@@ -109,7 +109,7 @@ class UserController {
           next(error);
           return;
         }
-        res.status(200).json({ success: true, user });
+        res.status(201).json({ success: true, user });
       });
     } catch (error) {
       next(error);
