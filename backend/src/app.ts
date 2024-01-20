@@ -1,4 +1,3 @@
-import userController from '@controllers/user';
 import compression from 'compression';
 import connectPgSimple from 'connect-pg-simple';
 import express from 'express';
@@ -9,6 +8,7 @@ import passport from 'passport';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUI from 'swagger-ui-express';
 
+import userRoute from '@routes/user';
 import logger from '@utils/logger';
 import { ENVIRONMENT, POSTGRES_URL, SESSION_SECRET } from '@utils/secret';
 
@@ -62,10 +62,10 @@ app.use(
           version: '1.0.0',
         },
       },
-      apis: ['./src/controllers/*.ts'],
+      apis: ['./src/routes/*.ts'],
     })
   )
 );
-app.use('/', userController);
+app.use('/', userRoute);
 
 export default app;

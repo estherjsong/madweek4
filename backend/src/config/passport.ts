@@ -1,9 +1,9 @@
-import userRepository from '@repositories/user';
 import * as argon2 from 'argon2';
 import { type NextFunction, type Request, type Response } from 'express';
 import passport from 'passport';
 import passportLocal from 'passport-local';
 
+import userRepository from '@repositories/user';
 import { type User } from '@src/schema';
 import logger from '@utils/logger';
 
@@ -19,7 +19,7 @@ passport.deserializeUser((id, done) => {
   process.nextTick(() => {
     userRepository
       .findUserById(id as number)
-      .then((user: User) => {
+      .then((user) => {
         done(null, user);
       })
       .catch((error) => {
@@ -35,7 +35,7 @@ passport.use(
     (userId, password, done) => {
       userRepository
         .findUserByUserId(userId)
-        .then((user: User) => {
+        .then((user) => {
           if (user == null) {
             done(null, false, { message: '존재하지 않는 아이디입니다.' });
             return;
