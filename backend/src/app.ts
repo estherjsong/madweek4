@@ -21,7 +21,7 @@ const sess: session.SessionOptions = {
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { httpOnly: true, secure: true },
+  cookie: { httpOnly: true, sameSite: 'none', secure: true },
   store: new PostgresqlStore({
     conString: POSTGRES_URL,
     createTableIfMissing: true,
@@ -30,8 +30,6 @@ const sess: session.SessionOptions = {
 
 if (ENVIRONMENT === 'production') {
   app.set('trust proxy', 1);
-} else {
-  sess.cookie!.sameSite = 'none';
 }
 
 app.set('port', process.argv[2] ?? 3000);
