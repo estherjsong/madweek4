@@ -1,6 +1,5 @@
-import { Row, Col, Table, Card, CardTitle, CardBody } from "reactstrap";
+import { Row, Col, Table, Card, CardTitle, CardBody, Pagination, PaginationItem, PaginationLink, Button } from "reactstrap";
 import { useState } from "react";
-import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import { Link } from "react-router-dom";
 
 const Questions = () => {
@@ -34,9 +33,17 @@ const Questions = () => {
         <Row>
             <Col lg="12">
                 <Card>
-                    <CardTitle tag="h6" className="border-bottom p-3 mb-0">
-                        <i className="bi bi-card-text me-2"> </i>
-                        Table with Hover
+                    <CardTitle tag="h6" className="border-bottom p-1 mb-0 d-flex justify-content-between">
+                        <div className="p-2">
+                            <i className="bi bi-card-text me-2"> </i>
+                            Table with Hover
+                        </div>
+                        <Link to="/ask" className="me-2">
+                            <Button className="btn" color="primary" size="sm">
+                                <i className="bi bi-plus"> </i>
+                                Add Question
+                            </Button>
+                        </Link>
                     </CardTitle>
                     <CardBody className="">
                         <Table bordered hover>
@@ -54,7 +61,7 @@ const Questions = () => {
                                     <tr key={data.id}>
                                         <th scope="row">{data.id}</th>
                                         <Link to={`/detail/${data.id}`} style={{
-                                            textDecoration: 'none', 
+                                            textDecoration: 'none',
                                             color: 'inherit',
                                             backgroundColor: 'transparent',
                                             display: 'inline-block',
