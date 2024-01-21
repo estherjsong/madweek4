@@ -53,30 +53,28 @@ const tableData = [
   },
 ];
 
-const ProjectTables = () => {
+const ScoreTables = () => {
   return (
     <div>
       <Card>
         <CardBody>
-          <CardTitle tag="h5">Project Listing</CardTitle>
+          <CardTitle tag="h5">Ranking</CardTitle>
           <CardSubtitle className="mb-2 text-muted" tag="h6">
-            Overview of the projects
+            Questions are most often solved by...
           </CardSubtitle>
 
           <Table className="no-wrap mt-3 align-middle" responsive borderless>
             <thead>
               <tr>
-                <th>Team Lead</th>
-                <th>Project</th>
-
-                <th>Status</th>
-                <th>Weeks</th>
-                <th>Budget</th>
+                <th></th>
+                <th>Nickname</th>
+                <th>Score</th>
               </tr>
             </thead>
             <tbody>
               {tableData.map((tdata, index) => (
                 <tr key={index} className="border-top">
+                  <td>{index + 1}</td>
                   <td>
                     <div className="d-flex align-items-center p-2">
                       <img
@@ -88,22 +86,11 @@ const ProjectTables = () => {
                       />
                       <div className="ms-3">
                         <h6 className="mb-0">{tdata.name}</h6>
-                        <span className="text-muted">{tdata.email}</span>
+                        {/* <span className="text-muted">{tdata.email}</span> */}
                       </div>
                     </div>
                   </td>
-                  <td>{tdata.project}</td>
-                  <td>
-                    {tdata.status === "pending" ? (
-                      <span className="p-2 bg-danger rounded-circle d-inline-block ms-3"></span>
-                    ) : tdata.status === "holt" ? (
-                      <span className="p-2 bg-warning rounded-circle d-inline-block ms-3"></span>
-                    ) : (
-                      <span className="p-2 bg-success rounded-circle d-inline-block ms-3"></span>
-                    )}
-                  </td>
                   <td>{tdata.weeks}</td>
-                  <td>{tdata.budget}</td>
                 </tr>
               ))}
             </tbody>
@@ -114,4 +101,4 @@ const ProjectTables = () => {
   );
 };
 
-export default ProjectTables;
+export default ScoreTables;

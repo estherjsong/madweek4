@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Badge,
@@ -17,11 +17,24 @@ import {
 import Logo from "./Logo";
 import { ReactComponent as LogoWhite } from "../assets/images/logos/adminprowhite.svg";
 import user1 from "../assets/images/users/user4.jpg";
-import RegisterForm from "../views/ui/Register";
-import LoginForm from "../views/ui/Login";
-import LogoutForm from "../views/ui/Logout";
+import RegisterForm from "../views/Register";
+import LoginForm from "../views/Login";
+import LogoutForm from "../views/Logout";
 
-const Header = ({ isLoggedIn, onLogout }) => {
+// const Header = ({ isLoggedIn, onLogout }) => {
+const Header = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    // Check the authentication status when the component mounts
+    checkAuthenticationStatus();
+  }, []);
+
+  const checkAuthenticationStatus = async () => {
+    const userId = localStorage.getItem('userId');
+    setIsLoggedIn(!!userId);
+  };
+
   const [isOpen, setIsOpen] = React.useState(false);
 
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
@@ -34,7 +47,7 @@ const Header = ({ isLoggedIn, onLogout }) => {
   const [notiColor, setNotiColor] = React.useState('secondary');
 
   useEffect(() => {
-    setNotiColor(howManyNoti===0 ? 'secondary' : 'primary');
+    setNotiColor(howManyNoti === 0 ? 'secondary' : 'primary');
   }, [howManyNoti]);
 
   const toggle = () => setDropdownOpen((prevState) => !prevState);
@@ -119,10 +132,14 @@ const Header = ({ isLoggedIn, onLogout }) => {
             ></img>
           </DropdownToggle>
           <DropdownMenu>
-            <DropdownItem header>Info</DropdownItem>
-            <DropdownItem>My Account</DropdownItem>
-            <DropdownItem>Edit Profile</DropdownItem>
-            <DropdownItem divider />
+            {isLoggedIn && (
+              <>
+                <DropdownItem header>Info</DropdownItem>
+                <DropdownItem>My Account</DropdownItem>
+                <DropdownItem>Edit Profile</DropdownItem>
+                <DropdownItem divider />
+              </>
+            )}
             {/* <DropdownItem>My Balance</DropdownItem>
             <DropdownItem>Inbox</DropdownItem> */}
             <div>
@@ -161,7 +178,7 @@ const Header = ({ isLoggedIn, onLogout }) => {
             }} />
         )}
         {isLogoutModalVisible && (
-          <LogoutForm isVisible={isLogoutModalVisible} onClose={toggleLogout} logout={onLogout} />
+          <LogoutForm isVisible={isLogoutModalVisible} onClose={toggleLogout} />
         )}
       </Collapse>
     </Navbar>

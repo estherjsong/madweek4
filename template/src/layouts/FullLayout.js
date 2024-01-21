@@ -7,32 +7,33 @@ import { useNavigate } from "react-router-dom";
 
 const FullLayout = () => {
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
     
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
-  useEffect(() => {
-    // Check the authentication status when the component mounts
-    checkAuthenticationStatus();
-  }, []);
+  // useEffect(() => {
+  //   // Check the authentication status when the component mounts
+  //   checkAuthenticationStatus();
+  // }, []);
 
-  const checkAuthenticationStatus = async () => {
-    const token = localStorage.getItem('login-token');
-    setIsLoggedIn(!!token);
-  };
+  // const checkAuthenticationStatus = async () => {
+  //   const token = localStorage.getItem('login-token');
+  //   setIsLoggedIn(!!token);
+  // };
 
-  const logout = () => {
-    localStorage.removeItem('login-token');
-    localStorage.clear();
-    checkAuthenticationStatus();
+  // const logout = () => {
+  //   localStorage.removeItem('login-token');
+  //   localStorage.clear();
+  //   checkAuthenticationStatus();
 
-    navigate('/');
-  };
+  //   navigate('/');
+  // };
 
   return (
     <main>
       {/********header**********/}
-      <Header isLoggedIn={isLoggedIn} onLogout={logout}/>
+      {/* <Header isLoggedIn={isLoggedIn} onLogout={logout}/> */}
+      <Header/>
       <div className="pageWrapper d-lg-flex">
         {/********Sidebar**********/}
         <aside className="sidebarArea shadow" id="sidebarArea">

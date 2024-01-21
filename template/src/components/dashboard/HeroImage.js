@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, Button } from 'reactstrap';
+import { Link } from 'react-router-dom';
 
 export default function HeroImage() {
     return (
@@ -21,10 +22,13 @@ export default function HeroImage() {
                         <div className='text-white'>
                             <h1 className='mb-3'>Website Name</h1>
                             <h4 className='mb-3'>Catchphrase</h4>
-                            <Button className="btn" outline color="primary">
-                                Register
-                                <i class="bi bi-arrow-right">  </i>
-                            </Button>
+
+                            <Link to="/ask">
+                                <Button className="btn" outline color="primary">
+                                    Go to ask  question
+                                    <i className="bi bi-arrow-right ms-2"></i>
+                                </Button>
+                            </Link>
                         </div>
                     </div>
                 </div>
