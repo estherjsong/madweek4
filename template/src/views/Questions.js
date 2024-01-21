@@ -1,6 +1,7 @@
 import { Row, Col, Table, Card, CardTitle, CardBody } from "reactstrap";
 import { useState } from "react";
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
+import { Link } from "react-router-dom";
 
 const Questions = () => {
     // Dummy data for questions
@@ -52,7 +53,15 @@ const Questions = () => {
                                 {currentPosts.map((data) => (
                                     <tr key={data.id}>
                                         <th scope="row">{data.id}</th>
-                                        <td>{data.question}</td>
+                                        <Link to={`/detail/${data.id}`} style={{
+                                            textDecoration: 'none', 
+                                            color: 'inherit',
+                                            backgroundColor: 'transparent',
+                                            display: 'inline-block',
+                                            width: '100%'
+                                        }}>
+                                            <span>{data.question}</span>
+                                        </Link>
                                         <td>{data.tags}</td>
                                         <td>{data.username}</td>
                                     </tr>
