@@ -1,5 +1,5 @@
 import { Row, Col, Table, Card, CardTitle, CardBody } from "reactstrap";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 
 const Questions = () => {

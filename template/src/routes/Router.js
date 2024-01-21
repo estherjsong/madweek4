@@ -10,6 +10,7 @@ const Starter = lazy(() => import("../views/Starter.js"));
 const About = lazy(() => import("../views/About.js"));
 const Ask = lazy(() => import("../views/Ask.js"));
 const Questions = lazy(() => import("../views/Questions.js"));
+const Detail = lazy(() => import("../views/Detail.js"));
 const Alerts = lazy(() => import("../views/ui/Alerts"));
 const Badges = lazy(() => import("../views/ui/Badges"));
 const Buttons = lazy(() => import("../views/ui/Buttons"));
@@ -30,7 +31,8 @@ const ThemeRoutes = [
       { path: "/starter", exact: true, element: <Starter /> },
       { path: "/about", exact: true, element: <About /> },
       { path: "/ask", exact: true, element: <Ask /> },
-      { path: "/questions", exact: true, element: <Questions />},
+      { path: "/questions", exact: true, element: <Questions /> },
+      { path: "/detail/:questionId", exact: true, element: <Detail /> },
       { path: "/alerts", exact: true, element: <Alerts /> },
       { path: "/badges", exact: true, element: <Badges /> },
       { path: "/buttons", exact: true, element: <Buttons /> },
