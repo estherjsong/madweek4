@@ -12,8 +12,8 @@ import {
     FormText,
 } from "reactstrap";
 import React, { useState } from 'react';
-import { API_BASE_URL } from "../../config";
-import { BackgroundOverlay } from '../../components/CommonStyles';
+import { API_BASE_URL } from "../config";
+import { BackgroundOverlay } from '../components/CommonStyles';
 
 const RegisterForm = ({ isVisible, onClose, onLog }) => {
     const [formData, setFormData] = useState({

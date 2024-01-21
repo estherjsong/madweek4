@@ -17,9 +17,9 @@ import {
 import Logo from "./Logo";
 import { ReactComponent as LogoWhite } from "../assets/images/logos/adminprowhite.svg";
 import user1 from "../assets/images/users/user4.jpg";
-import RegisterForm from "../views/ui/Register";
-import LoginForm from "../views/ui/Login";
-import LogoutForm from "../views/ui/Logout";
+import RegisterForm from "../views/Register";
+import LoginForm from "../views/Login";
+import LogoutForm from "../views/Logout";
 
 // const Header = ({ isLoggedIn, onLogout }) => {
 const Header = () => {

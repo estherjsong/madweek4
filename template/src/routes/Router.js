@@ -18,7 +18,6 @@ const Grid = lazy(() => import("../views/ui/Grid"));
 const Tables = lazy(() => import("../views/ui/Tables"));
 const Forms = lazy(() => import("../views/ui/Forms"));
 const Breadcrumbs = lazy(() => import("../views/ui/Breadcrumbs"));
-const RegisterForm = lazy(() => import("../views/ui/Register.js"))
 
 /*****Routes******/
 
