@@ -14,7 +14,7 @@ const navigation = [
   },
   {
     title: "All Questions",
-    href: "/",
+    href: "/questions",
     icon: "bi bi-card-list",
   },
   {

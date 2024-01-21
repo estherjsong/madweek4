@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, Row, Col, CardTitle, CardBody, Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
 import CodeMirror from '@uiw/react-codemirror';
 import { darcula } from '@uiw/codemirror-themes-all';
-import { langs, loadLanguage } from '@uiw/codemirror-extensions-langs';
+import { loadLanguage } from '@uiw/codemirror-extensions-langs';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/material.css';
 import 'codemirror/mode/javascript/javascript';
@@ -10,7 +10,6 @@ import 'react-tagsinput/react-tagsinput.css'; // Import the styles for react-tag
 import TagsInput from 'react-tagsinput'; // Import the react-tagsinput component
 import { API_BASE_URL } from '../config';
 import language from './languages.json';
-import Tags from '../components/Tags';
 
 const Ask = () => {
     const [langSelect, setLangSelect] = useState('javascript')
