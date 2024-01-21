@@ -1,0 +1,85 @@
+import { type Request } from 'express';
+import { body, param } from 'express-validator';
+
+import questionRepository from '@repositories/question';
+import { type Tag, type User } from '@src/schema';
+
+class QuestionService {
+  async validateQuestion(req: Request): Promise<void> {
+    await body('title', '제목을 작성해주세요.')
+      .trim()
+      .isString()
+      .notEmpty()
+      .run(req);
+    await body('code', '코드를 작성해주세요.')
+      .trim()
+      .isString()
+      .notEmpty()
+      .run(req);
+    await body('tags.*.id', '태그를 정상적으로 입력해주세요.')
+      .optional()
+      .isInt()
+      .toInt()
+      .run(req);
+    await body('tags.*.name', '태그를 정상적으로 입력해주세요.')
+      .optional()
+      .isString()
+      .run(req);
+    await body('tags.*.type', '태그를 정상적으로 입력해주세요.')
+      .optional()
+      .isInt()
+      .toInt()
+      .run(req);
+    await body('tags.*', '태그를 정상적으로 입력해주세요.')
+      .optional()
+      .custom((value) => 'id' in value || ('name' in value && 'type' in value))
+      .run(req);
+  }
+
+  async validateWriter(req: Request): Promise<void> {
+    await param('id', '올바르지 않은 질문입니다.')
+      .isInt()
+      .toInt()
+      .custom(async (value: number) => {
+        const question = await questionRepository.findQuestionById(value);
+        if (question == null) throw new Error();
+        if (question.userId !== (req.user as User).id) {
+          throw new Error('작성하신 질문이 아닙니다.');
+        }
+      })
+      .run(req);
+  }
+
+  async getTagsByBodyData(
+    data: Array<{ id: number } | { name: string; type: number }>
+  ): Promise<Tag[]> {
+    const tags = await Promise.all(
+      data
+        .filter((tag, index) => {
+          if ('id' in tag) {
+            return (
+              data.findIndex((e) => 'id' in e && tag.id === e.id) === index
+            );
+          }
+          return (
+            data.findIndex((e) => 'name' in e && tag.name === e.name) === index
+          );
+        })
+        .map(async (tag) => {
+          if ('id' in tag) {
+            return await questionRepository.findTagById(tag.id);
+          }
+          return (
+            (await questionRepository.findTagByName(tag.name)) ??
+            (await questionRepository.createTag(tag.name, tag.type))
+          );
+        })
+    );
+
+    return tags
+      .filter((tag, index) => tags.findIndex((e) => e.id === tag.id) === index)
+      .sort((a, b) => a.id - b.id);
+  }
+}
+
+export default new QuestionService();

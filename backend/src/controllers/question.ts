@@ -1,91 +1,89 @@
-import { type NextFunction, type Request, type Response } from 'express';
-import { body, matchedData, validationResult } from 'express-validator';
+import { type RequestHandler } from 'express';
+import { matchedData, param, query, validationResult } from 'express-validator';
 
 import questionRepository from '@repositories/question';
+import questionService from '@services/question';
 import { type User } from '@src/schema';
 
 class QuestionController {
-  postQuestion = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    await body('title', '제목을 작성해주세요.')
-      .trim()
-      .isString()
-      .notEmpty()
-      .run(req);
-    await body('code', '코드를 작성해주세요.')
-      .trim()
-      .isString()
-      .notEmpty()
-      .run(req);
-    await body('tags.*.id', '태그를 정상적으로 입력해주세요.')
+  getQuestions: RequestHandler = async (req, res, next) => {
+    await query('offset', '올바르지 않은 오프셋입니다.')
       .optional()
+      .default(0)
       .isInt()
       .toInt()
-      .run(req);
-    await body('tags.*.name', '태그를 정상적으로 입력해주세요.')
-      .optional()
-      .isString()
-      .run(req);
-    await body('tags.*.type', '태그를 정상적으로 입력해주세요.')
-      .optional()
-      .isInt()
-      .toInt()
-      .run(req);
-    await body('tags.*', '태그를 정상적으로 입력해주세요.')
-      .custom((value) => 'id' in value || ('name' in value && 'type' in value))
       .run(req);
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      res.status(400).json({ success: false, errors: errors.array() });
+      res.status(400).json({ errors: errors.array() });
+      return;
+    }
+
+    const data: Record<string, number> = matchedData(req);
+
+    try {
+      const questions = await questionRepository.findQuestions(10, data.offset);
+      const questionWithTags = await Promise.all(
+        questions.map(async (question) => ({
+          ...question,
+          tags: await questionRepository.findTagsByQuestionId(question.id),
+        }))
+      );
+      res.status(200).json(questionWithTags);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getQuestion: RequestHandler = async (req, res, next) => {
+    await param('id', '올바르지 않은 질문입니다.')
+      .isInt()
+      .toInt()
+      .custom(async (value: number) => {
+        if ((await questionRepository.countQuestionById(value)) === 0) {
+          throw new Error();
+        }
+      })
+      .run(req);
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors.array() });
+      return;
+    }
+
+    const data: Record<string, number> = matchedData(req);
+
+    try {
+      const question = await questionRepository.findQuestionById(data.id);
+      const tags = await questionRepository.findTagsByQuestionId(question.id);
+
+      res.status(200).json({ ...question, tags });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  postQuestion: RequestHandler = async (req, res, next) => {
+    await questionService.validateQuestion(req);
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors.array() });
       return;
     }
 
     const data = matchedData(req);
-    const tagData = data.tags as Array<
-      { id: number } | { name: string; type: number }
-    >;
     const user = req.user as User;
 
     try {
-      let tags = await Promise.all(
-        tagData
-          .filter((tag, index) => {
-            if ('id' in tag) {
-              return (
-                tagData.findIndex((e) => 'id' in e && tag.id === e.id) === index
-              );
-            }
-            return (
-              tagData.findIndex((e) => 'name' in e && tag.name === e.name) ===
-              index
-            );
-          })
-          .map(async (tag) => {
-            if ('id' in tag) {
-              return await questionRepository.findTagById(tag.id);
-            }
-            return (
-              (await questionRepository.findTagByName(tag.name)) ??
-              (await questionRepository.createTag(tag.name, tag.type))
-            );
-          })
-      );
-
+      const tags = await questionService.getTagsByBodyData(data.tags || []);
       const question = await questionRepository.createQuestion(
         data.title as string,
         data.code as string,
         user.id
       );
-
-      tags = tags
-        .filter(
-          (tag, index) => tags.findIndex((e) => e.id === tag.id) === index
-        )
-        .sort((a, b) => a.id - b.id);
 
       await questionRepository.createQuestionTags(
         tags.map((tag) => ({
@@ -94,7 +92,68 @@ class QuestionController {
         }))
       );
 
-      res.status(201).json({ success: true, question: { ...question, tags } });
+      res.status(201).json({ ...question, tags });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  putQuestion: RequestHandler = async (req, res, next) => {
+    await questionService.validateWriter(req);
+    await questionService.validateQuestion(req);
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors.array() });
+      return;
+    }
+
+    const data = matchedData(req);
+
+    try {
+      const newTags = await questionService.getTagsByBodyData(data.tags || []);
+      const question = await questionRepository.updateQuestion(
+        data.id as number,
+        data.title as string,
+        data.code as string
+      );
+
+      const tags = await questionRepository.findTagsByQuestionId(question.id);
+      await questionRepository.deleteQuestionTagsByTagIds(
+        tags
+          .filter((tag) => !newTags.some((e) => tag.id === e.id))
+          .map((tag) => tag.id)
+      );
+
+      await questionRepository.createQuestionTags(
+        newTags.map((tag) => ({
+          questionId: question.id,
+          tagId: tag.id,
+        }))
+      );
+
+      res.status(200).json({ ...question, tags: newTags });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deleteQuestion: RequestHandler = async (req, res, next) => {
+    await questionService.validateWriter(req);
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors.array() });
+      return;
+    }
+
+    const data: Record<string, number> = matchedData(req);
+
+    try {
+      const question = await questionRepository.deleteQuestionById(data.id);
+      const tags = await questionRepository.findTagsByQuestionId(question.id);
+      await questionRepository.deleteQuestionTagsByTagId(question.id);
+      return res.status(200).json({ ...question, tags });
     } catch (error) {
       next(error);
     }
