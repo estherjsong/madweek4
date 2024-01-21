@@ -2,8 +2,9 @@ import errorHandler from 'errorhandler';
 
 import app from '@src/app';
 import logger from '@utils/logger';
+import { ENVIRONMENT } from '@utils/secret';
 
-if (process.env.NODE_ENV !== 'production') {
+if (ENVIRONMENT !== 'production') {
   app.use(
     errorHandler({
       log: (error) =>
