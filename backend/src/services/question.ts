@@ -2,7 +2,7 @@ import { type Request } from 'express';
 import { body, param } from 'express-validator';
 
 import questionRepository from '@repositories/question';
-import { type Tag, type User } from '@src/schema';
+import { type User } from '@src/schema';
 
 class QuestionService {
   async validateQuestion(req: Request): Promise<void> {
@@ -48,37 +48,6 @@ class QuestionService {
         }
       })
       .run(req);
-  }
-
-  async getTagsByBodyData(
-    data: Array<{ id: number } | { name: string; type: number }>
-  ): Promise<Tag[]> {
-    const tags = await Promise.all(
-      data
-        .filter((tag, index) => {
-          if ('id' in tag) {
-            return (
-              data.findIndex((e) => 'id' in e && tag.id === e.id) === index
-            );
-          }
-          return (
-            data.findIndex((e) => 'name' in e && tag.name === e.name) === index
-          );
-        })
-        .map(async (tag) => {
-          if ('id' in tag) {
-            return await questionRepository.findTagById(tag.id);
-          }
-          return (
-            (await questionRepository.findTagByName(tag.name)) ??
-            (await questionRepository.createTag(tag.name, tag.type))
-          );
-        })
-    );
-
-    return tags
-      .filter((tag, index) => tags.findIndex((e) => e.id === tag.id) === index)
-      .sort((a, b) => a.id - b.id);
   }
 }
 

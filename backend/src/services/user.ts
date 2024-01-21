@@ -11,7 +11,7 @@ class UserService {
       .isLength({ min: 6, max: 12 })
       .isAlphanumeric()
       .custom(async (value: string) => {
-        if ((await userRepository.countUserId(value)) > 0) {
+        if ((await userRepository.countUserByUserId(value)) > 0) {
           throw new Error('이미 존재하는 아이디입니다.');
         }
       })
@@ -38,7 +38,7 @@ class UserService {
       .isString()
       .isLength({ min: 3, max: 16 })
       .custom(async (value: string) => {
-        if ((await userRepository.countNickname(value)) > 0) {
+        if ((await userRepository.countUserByNickname(value)) > 0) {
           throw new Error('이미 존재하는 닉네임입니다.');
         }
       })

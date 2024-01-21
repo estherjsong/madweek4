@@ -1,59 +1,74 @@
-import { count, desc, eq, inArray } from 'drizzle-orm';
+import {
+  type SQLWrapper,
+  and,
+  count,
+  desc,
+  eq,
+  getTableColumns,
+  ilike,
+  inArray,
+} from 'drizzle-orm';
 
 import db from '@src/db';
 import * as schema from '@src/schema';
 
 class QuestionRepository {
-  async findQuestions(
-    limit: number,
-    offset: number
-  ): Promise<schema.Question[]> {
-    const result = await db
-      .select()
-      .from(schema.questions)
-      .orderBy(desc(schema.questions.createdAt))
-      .limit(limit)
-      .offset(offset);
-    return result;
-  }
+  async findQuestionById(
+    id: number
+  ): Promise<schema.Question & { user: Omit<schema.User, 'password'> }> {
+    const { password, ...user } = getTableColumns(schema.users);
 
-  async findQuestionById(id: number): Promise<schema.Question> {
     const result = await db
-      .select()
+      .select({ ...getTableColumns(schema.questions), user })
       .from(schema.questions)
+      .innerJoin(schema.users, eq(schema.questions.userId, schema.users.id))
       .where(eq(schema.questions.id, id));
     return result[0];
   }
 
-  async findTagById(id: number): Promise<schema.Tag> {
-    const result = await db
-      .select()
-      .from(schema.tags)
-      .where(eq(schema.tags.id, id));
-    return result[0];
-  }
+  async searchQuestions(
+    limit: number,
+    offset: number,
+    title?: string,
+    nickname?: string,
+    tag?: string
+  ): Promise<Array<schema.Question & { user: Omit<schema.User, 'password'> }>> {
+    const conditions: SQLWrapper[] = [];
 
-  async findTagByName(name: string): Promise<schema.Tag> {
-    const result = await db
-      .select()
-      .from(schema.tags)
-      .where(eq(schema.tags.name, name));
-    return result[0];
-  }
+    if (title !== undefined) {
+      conditions.push(ilike(schema.questions.title, `%${title}%`));
+    }
 
-  async findTagsByQuestionId(questionId: number): Promise<schema.Tag[]> {
-    const result = await db
-      .select()
-      .from(schema.tags)
-      .where(
+    if (nickname !== undefined) {
+      conditions.push(ilike(schema.users.nickname, `%${nickname}%`));
+    }
+
+    if (tag !== undefined) {
+      conditions.push(
         inArray(
-          schema.tags.id,
+          schema.questions.id,
           db
-            .select({ value: schema.questionTags.tagId })
-            .from(schema.questionTags)
-            .where(eq(schema.questionTags.questionId, questionId))
+            .selectDistinct({ questionId: schema.questionTags.questionId })
+            .from(schema.tags)
+            .where(ilike(schema.tags.name, `%${tag}%`))
+            .leftJoin(
+              schema.questionTags,
+              eq(schema.tags.id, schema.questionTags.tagId)
+            )
         )
       );
+    }
+
+    const { password, ...user } = getTableColumns(schema.users);
+
+    const result = await db
+      .select({ ...getTableColumns(schema.questions), user })
+      .from(schema.questions)
+      .innerJoin(schema.users, eq(schema.questions.userId, schema.users.id))
+      .where(and(...conditions))
+      .orderBy(desc(schema.questions.createdAt))
+      .limit(limit)
+      .offset(offset);
     return result;
   }
 
@@ -69,27 +84,7 @@ class QuestionRepository {
     return result[0];
   }
 
-  async createTag(name: string, type: number): Promise<schema.Tag> {
-    const result = await db
-      .insert(schema.tags)
-      .values({ name, type })
-      .returning();
-    return result[0];
-  }
-
-  async createQuestionTags(
-    questionTags: Array<{ questionId: number; tagId: number }>
-  ): Promise<schema.QuestionTag[] | null> {
-    if (questionTags.length === 0) return null;
-    const result = await db
-      .insert(schema.questionTags)
-      .values(questionTags)
-      .onConflictDoNothing()
-      .returning();
-    return result;
-  }
-
-  async updateQuestion(
+  async updateQuestionById(
     id: number,
     title: string,
     code: string
@@ -108,25 +103,6 @@ class QuestionRepository {
       .where(eq(schema.questions.id, id))
       .returning();
     return result[0];
-  }
-
-  async deleteQuestionTagsByTagId(id: number): Promise<schema.QuestionTag[]> {
-    const result = await db
-      .delete(schema.questionTags)
-      .where(eq(schema.questionTags.tagId, id))
-      .returning();
-    return result;
-  }
-
-  async deleteQuestionTagsByTagIds(
-    id: number[]
-  ): Promise<schema.QuestionTag[] | null> {
-    if (id.length === 0) return null;
-    const result = await db
-      .delete(schema.questionTags)
-      .where(inArray(schema.questionTags.tagId, id))
-      .returning();
-    return result;
   }
 
   async countQuestionById(id: number): Promise<number> {

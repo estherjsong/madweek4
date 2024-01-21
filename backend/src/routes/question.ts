@@ -35,18 +35,6 @@ const router = express.Router();
  *            type: string
  *            format: date-time
  *            description: 질문을 작성한 날짜와 시각
- *      Tag:
- *        type: object
- *        properties:
- *          id:
- *            type: integer
- *            description: 자동 생성된 태그 고유값
- *          name:
- *            type: string
- *            description: 태그명
- *          type:
- *            type: integer
- *            description: 태그 종류
  */
 
 /**
@@ -54,7 +42,7 @@ const router = express.Router();
  *  paths:
  *   /question:
  *     get:
- *       summary: 최근에 올라온 질문 10개 반환
+ *       summary: 조건에 맞는 질문 10개 반환
  *       tags: [Question]
  *       parameters:
  *         - in: query
@@ -62,9 +50,24 @@ const router = express.Router();
  *           schema:
  *             type: integer
  *           description: 스킵할 질문 수
+ *         - in: query
+ *           name: title
+ *           schema:
+ *             type: string
+ *           description: 검색할 제목
+ *         - in: query
+ *           name: nickname
+ *           schema:
+ *             type: string
+ *           description: 검색할 작성자 닉네임
+ *         - in: query
+ *           name: tag
+ *           schema:
+ *             type: string
+ *           description: 검색할 태그
  *       responses:
  *         "200":
- *           description: 최근에 올라온 질문 10개
+ *           description: 조건에 맞는 질문 10개
  *           content:
  *             application/json:
  *               schema:
@@ -74,6 +77,8 @@ const router = express.Router();
  *                     - $ref: '#/components/schemas/Question'
  *                     - type: object
  *                       properties:
+ *                         user:
+ *                           $ref: '#/components/schemas/User'
  *                         tags:
  *                           type: array
  *                           items:
@@ -105,6 +110,8 @@ router.get('/', questionController.getQuestions);
  *                   - $ref: '#/components/schemas/Question'
  *                   - type: object
  *                     properties:
+ *                       user:
+ *                         $ref: '#/components/schemas/User'
  *                       tags:
  *                         type: array
  *                         items:

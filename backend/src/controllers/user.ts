@@ -26,7 +26,9 @@ class UserController {
             next(error);
             return;
           }
-          res.status(200).json(user);
+
+          const { password, ...userWithoutPassword } = user;
+          res.status(200).json(userWithoutPassword);
         });
       }
     )(req, res, next);
@@ -65,7 +67,9 @@ class UserController {
           next(error);
           return;
         }
-        res.status(201).json(user);
+
+        const { password, ...userWithoutPassword } = user;
+        res.status(201).json(userWithoutPassword);
       });
     } catch (error) {
       next(error);

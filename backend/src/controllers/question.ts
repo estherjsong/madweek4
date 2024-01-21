@@ -1,6 +1,8 @@
 import { type RequestHandler } from 'express';
 import { matchedData, param, query, validationResult } from 'express-validator';
 
+import tagRepository from '@repositories/tag';
+import tagService from '@services/tag';
 import questionRepository from '@repositories/question';
 import questionService from '@services/question';
 import { type User } from '@src/schema';
@@ -13,6 +15,18 @@ class QuestionController {
       .isInt()
       .toInt()
       .run(req);
+    await query('title', '올바르지 않은 제목입니다.')
+      .optional()
+      .isString()
+      .run(req);
+    await query('nickname', '올바르지 않은 닉네임입니다.')
+      .optional()
+      .isString()
+      .run(req);
+    await query('tag', '올바르지 않은 태그입니다.')
+      .optional()
+      .isString()
+      .run(req);
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -20,14 +34,20 @@ class QuestionController {
       return;
     }
 
-    const data: Record<string, number> = matchedData(req);
+    const data = matchedData(req);
 
     try {
-      const questions = await questionRepository.findQuestions(10, data.offset);
+      const questions = await questionRepository.searchQuestions(
+        10,
+        data.offset as number,
+        data.title as string | undefined,
+        data.nickname as string | undefined,
+        data.tag as string | undefined
+      );
       const questionWithTags = await Promise.all(
         questions.map(async (question) => ({
           ...question,
-          tags: await questionRepository.findTagsByQuestionId(question.id),
+          tags: await tagRepository.findTagsByQuestionId(question.id),
         }))
       );
       res.status(200).json(questionWithTags);
@@ -57,7 +77,7 @@ class QuestionController {
 
     try {
       const question = await questionRepository.findQuestionById(data.id);
-      const tags = await questionRepository.findTagsByQuestionId(question.id);
+      const tags = await tagRepository.findTagsByQuestionId(question.id);
 
       res.status(200).json({ ...question, tags });
     } catch (error) {
@@ -78,18 +98,16 @@ class QuestionController {
     const user = req.user as User;
 
     try {
-      const tags = await questionService.getTagsByBodyData(data.tags || []);
+      const tags = await tagService.getTagsByBodyData(data.tags || []);
       const question = await questionRepository.createQuestion(
         data.title as string,
         data.code as string,
         user.id
       );
 
-      await questionRepository.createQuestionTags(
-        tags.map((tag) => ({
-          questionId: question.id,
-          tagId: tag.id,
-        }))
+      await tagRepository.createQuestionTags(
+        question.id,
+        tags.map((tag) => tag.id)
       );
 
       res.status(201).json({ ...question, tags });
@@ -111,25 +129,23 @@ class QuestionController {
     const data = matchedData(req);
 
     try {
-      const newTags = await questionService.getTagsByBodyData(data.tags || []);
-      const question = await questionRepository.updateQuestion(
+      const newTags = await tagService.getTagsByBodyData(data.tags || []);
+      const question = await questionRepository.updateQuestionById(
         data.id as number,
         data.title as string,
         data.code as string
       );
 
-      const tags = await questionRepository.findTagsByQuestionId(question.id);
-      await questionRepository.deleteQuestionTagsByTagIds(
+      const tags = await tagRepository.findTagsByQuestionId(question.id);
+      await tagRepository.deleteQuestionTagsByTagIds(
         tags
           .filter((tag) => !newTags.some((e) => tag.id === e.id))
           .map((tag) => tag.id)
       );
 
-      await questionRepository.createQuestionTags(
-        newTags.map((tag) => ({
-          questionId: question.id,
-          tagId: tag.id,
-        }))
+      await tagRepository.createQuestionTags(
+        question.id,
+        newTags.map((tag) => tag.id)
       );
 
       res.status(200).json({ ...question, tags: newTags });
@@ -151,8 +167,8 @@ class QuestionController {
 
     try {
       const question = await questionRepository.deleteQuestionById(data.id);
-      const tags = await questionRepository.findTagsByQuestionId(question.id);
-      await questionRepository.deleteQuestionTagsByTagId(question.id);
+      const tags = await tagRepository.findTagsByQuestionId(question.id);
+      await tagRepository.deleteQuestionTagsByTagIds(tags.map((tag) => tag.id));
       return res.status(200).json({ ...question, tags });
     } catch (error) {
       next(error);
