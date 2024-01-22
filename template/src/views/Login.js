@@ -79,13 +79,14 @@ const LoginForm = ({ isVisible, onClose, onReg }) => {
 
                     localStorage.setItem('userId', result.userId)
                     localStorage.setItem('nickname', result.nickname)
+                    localStorage.setItem('id', result.id)
 
                     // cookie.save('userId',result.userId, {
                     //     path: '/',
                     // })
 
                     onClose();
-                    // window.location.reload();
+                    window.location.reload();
 
                 } else {
                     // 로그인이 실패한 경우

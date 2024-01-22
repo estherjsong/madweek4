@@ -1,6 +1,6 @@
 import React, { Suspense, useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Card, Row, Col, CardTitle, CardBody, CardText, Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
+import { useNavigate, useParams, Link } from 'react-router-dom';
+import { Card, Row, Col, CardTitle, CardBody, CardText, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import CodeMirror from '@uiw/react-codemirror';
 import { darcula } from '@uiw/codemirror-themes-all';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
@@ -18,6 +18,8 @@ import Loader from '../layouts/loader/Loader';
 import { formatDateString } from '../dateUtils';
 
 const Detail = () => {
+    const id = localStorage.getItem('id');
+    console.log("userid", id)
     const answersData = [
         {
             id: 1,
@@ -49,7 +51,10 @@ const Detail = () => {
     const { questionId } = useParams();
     const [post, setPost] = useState();
     const [loading, setLoading] = useState(true); // Track loading state
+    const [modal, setModal] = useState(false);
     const navigate = useNavigate();
+
+    const toggle = () => setModal(!modal);
 
     useEffect(() => {
         // Define your function to fetch data
@@ -58,6 +63,7 @@ const Detail = () => {
                 const response = await axios.get(`/question/${questionId}`);
                 setPost(response.data);
                 console.log(response.data);
+                // console.log(typeof id, typeof post.userId, parseInt(id)===post.userId)
             } catch (error) {
                 console.error('Error fetching data:', error);
             } finally {
@@ -73,6 +79,25 @@ const Detail = () => {
         navigate(-1); // Equivalent to history.goBack()
     };
 
+    const deleteQuestion = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/question/${questionId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            })
+            console.log(response.data);
+            // console.log(typeof id, typeof post.userId, parseInt(id)===post.userId)
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        } finally {
+            navigate('/questions');
+        }
+    };
+
+
     return (
         <Suspense fallback={<Loader />}>
             {loading ? (
@@ -81,9 +106,27 @@ const Detail = () => {
                 <Row>
                     <Col lg="12">
                         <Card style={{ maxWidth: '1210px', overflowX: 'auto' }}>
-                            <CardTitle tag="h6" className="border-bottom p-3 mb-0">
-                                <i className="bi bi-chevron-left me-2" onClick={handleGoBack}></i>
-                                # {questionId} Question
+                            <CardTitle tag="h6" className="border-bottom p-1 mb-0 d-flex justify-content-between flex-column flex-sm-row">
+                                <div className="p-2">
+                                    <i className="bi bi-chevron-left me-2" onClick={handleGoBack}></i>
+                                    # {questionId} Question
+                                </div>
+
+                                <div className="me-3">
+                                    {(parseInt(id) === post.userId) &&
+                                        <div>
+                                            <Link to={`/edit/${post.id}`} className='me-3'>
+                                                <Button className="btn" color="primary" size="sm">
+                                                    <i className="bi bi-pencil-square me-1"> </i>
+                                                    <span className="d-none d-sm-inline"> Edit Question</span>
+                                                </Button>
+                                            </Link>
+                                            <Button className="btn" color="primary" size="sm" onClick={toggle}>
+                                                <i className="bi bi-trash"> </i>
+                                            </Button>
+                                        </div>
+                                    }
+                                </div>
                             </CardTitle>
                             <CardBody>
                                 <CardText>
@@ -95,6 +138,7 @@ const Detail = () => {
                                     value={post.code}
                                     // value={'#include <stdio.h>\n\nint main() {\n    for(int i=0; i<5; i++){\n        for(int j=0; j<5; j++){\n            printf(\'%d %d\', i, j);\n        }\n    }\n     return 0;\n}'}
                                     theme={darcula}
+                                    minHeight={'100px'}
                                     extensions={[loadLanguage(post.tags[0].name), EditorView.editable.of(false), EditorState.readOnly.of(true)]}
                                 />
 
@@ -124,16 +168,30 @@ const Detail = () => {
                                         {answer.content}
                                     </CardText>
                                     <div className="d-flex justify-content-end me-2 flex-column ms-auto">
-                                        <small className="text-muted">{answer.timestamp}</small>
+                                        <small className="text-muted">{formatDateString(answer.timestamp)}</small>
                                         <small className="text-muted">{answer.author}</small>
                                     </div>
                                 </CardBody>
                             </Card>
                         ))}
+                        <Modal isOpen={modal} toggle={toggle}>
+                            <ModalHeader toggle={toggle}>Question Deletion</ModalHeader>
+                            <ModalBody>
+                                Are you sure you want to delete this post? This action cannot be undone.
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button color="secondary" onClick={toggle}>
+                                    Cancel
+                                </Button>{' '}
+                                <Button color="primary" onClick={deleteQuestion}>
+                                    Delete
+                                </Button>
+                            </ModalFooter>
+                        </Modal>
                     </Col>
-                </Row>
+                </Row >
             )}
-        </Suspense>
+        </Suspense >
     );
 }
 

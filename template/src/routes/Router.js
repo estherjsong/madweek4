@@ -9,6 +9,7 @@ const FullLayout = lazy(() => import("../layouts/FullLayout.js"));
 const Starter = lazy(() => import("../views/Starter.js"));
 const About = lazy(() => import("../views/About.js"));
 const Ask = lazy(() => import("../views/Ask.js"));
+const Edit = lazy(() => import("../views/Edit.js"));
 const Questions = lazy(() => import("../views/Questions.js"));
 const Detail = lazy(() => import("../views/Detail.js"));
 const Alerts = lazy(() => import("../views/ui/Alerts"));
@@ -31,6 +32,7 @@ const ThemeRoutes = [
       { path: "/starter", exact: true, element: <Starter /> },
       { path: "/about", exact: true, element: <About /> },
       { path: "/ask", exact: true, element: <Ask /> },
+      { path: "/edit/:questionId", exact: true, element: <Edit /> },
       { path: "/questions", exact: true, element: <Questions /> },
       { path: "/detail/:questionId", exact: true, element: <Detail /> },
       { path: "/alerts", exact: true, element: <Alerts /> },

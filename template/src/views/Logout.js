@@ -1,26 +1,20 @@
 import {
     Card,
-    Row,
-    Col,
     CardTitle,
     CardBody,
     Button,
-    Form,
-    FormGroup,
-    Label,
-    Input,
-    FormText,
 } from "reactstrap";
-import React, { useState } from 'react';
+import React from 'react';
 import { API_BASE_URL } from "../config";
 import { BackgroundOverlay } from '../components/CommonStyles';
+import { useNavigate } from "react-router-dom";
 
 const LogoutForm = ({ isVisible, onClose }) => {
+    const navigate = useNavigate();
 
     // Submit function
     const handleLogout = async (e) => {
-        localStorage.removeItem('userId');
-        localStorage.removeItem('nickname');
+
         localStorage.clear();
 
         try {
@@ -37,27 +31,12 @@ const LogoutForm = ({ isVisible, onClose }) => {
 
             console.log("response", response)
 
-            if (response.ok) {
-                // 로그인이 성공한 경우
-                console.log('Logout successful - result:', result);
-
-                // 여기에서 result에 있는 정보를 활용하여 필요한 작업을 수행할 수 있습니다.
-                const { success } = result;
-                if (success) {
-                    console.log("logout success")
-                }
-
-                onClose();
-            } else {
-                // 로그인이 실패한 경우
-                console.log('Logout failed:', result);
-                // 여기에서 적절한 에러 처리를 수행할 수 있습니다.
-            }
         } catch (error) {
             console.error('An error occurred during login:', error);
             // 여기에서 적절한 에러 처리를 수행할 수 있습니다.
         }
 
+        navigate('/');
         onClose()
         window.location.reload();
     };
