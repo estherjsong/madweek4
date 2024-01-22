@@ -37,6 +37,46 @@ const router = express.Router();
 /**
  *  @swagger
  *  paths:
+ *   /user/{id}:
+ *     get:
+ *       summary: 고유값에 해당하는 유저 반환
+ *       tags: [User]
+ *       parameters:
+ *         - in: path
+ *           name: id
+ *           schema:
+ *             type: integer
+ *           description: 유저의 고유값
+ *       responses:
+ *         "200":
+ *           description: 유저
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 allOf:
+ *                   - $ref: '#/components/schemas/User'
+ *                   - type: object
+ *                     properties:
+ *                       score:
+ *                         type: integer
+ *                         description: 유저의 점수
+ *                       topLanguages:
+ *                         type: array
+ *                         items:
+ *                           allOf:
+ *                             - $ref: '#/components/schemas/Tag'
+ *                             - type: object
+ *                               properties:
+ *                                 count:
+ *                                   type: integer
+ *                                   description: 질문 횟수
+ *                         description: 가장 많이 질문한 언어
+ */
+router.get('/user/:id(\\d+)/', userController.getUser);
+
+/**
+ *  @swagger
+ *  paths:
  *   /login:
  *     post:
  *       summary: 아이디와 비밀번호로 로그인

@@ -14,19 +14,19 @@ import * as schema from '@src/schema';
 
 class TagRepository {
   async findTagById(id: number): Promise<schema.Tag> {
-    const result = await db
+    const [result] = await db
       .select()
       .from(schema.tags)
       .where(eq(schema.tags.id, id));
-    return result[0];
+    return result;
   }
 
   async findTagByName(name: string): Promise<schema.Tag> {
-    const result = await db
+    const [result] = await db
       .select()
       .from(schema.tags)
       .where(eq(schema.tags.name, name));
-    return result[0];
+    return result;
   }
 
   async findTagsByQuestionId(questionId: number): Promise<schema.Tag[]> {
@@ -80,11 +80,11 @@ class TagRepository {
   }
 
   async createTag(name: string, type: number): Promise<schema.Tag> {
-    const result = await db
+    const [result] = await db
       .insert(schema.tags)
       .values({ name, type })
       .returning();
-    return result[0];
+    return result;
   }
 
   async createQuestionTags(
@@ -122,11 +122,11 @@ class TagRepository {
       conditions.push(eq(schema.tags.type, type));
     }
 
-    const result = await db
+    const [{ value: result }] = await db
       .select({ value: count() })
       .from(schema.tags)
       .where(and(...conditions));
-    return result[0].value;
+    return result;
   }
 }
 

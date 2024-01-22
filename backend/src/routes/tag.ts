@@ -26,7 +26,7 @@ const router = express.Router();
  *            description: 태그명
  *          type:
  *            type: integer
- *            description: 태그 종류
+ *            description: "태그 종류 (1: 언어, 2: 질문)"
  */
 
 /**

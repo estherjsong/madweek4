@@ -17,12 +17,12 @@ class QuestionRepository {
     id: number
   ): Promise<schema.Question & { user: Omit<schema.User, 'password'> }> {
     const { password, ...user } = getTableColumns(schema.users);
-    const result = await db
+    const [result] = await db
       .select({ ...getTableColumns(schema.questions), user })
       .from(schema.questions)
       .where(eq(schema.questions.id, id))
       .innerJoin(schema.users, eq(schema.questions.userId, schema.users.id));
-    return result[0];
+    return result;
   }
 
   async searchQuestions(
@@ -75,11 +75,11 @@ class QuestionRepository {
     code: string,
     userId: number
   ): Promise<schema.Question> {
-    const result = await db
+    const [result] = await db
       .insert(schema.questions)
       .values({ title, code, userId })
       .returning();
-    return result[0];
+    return result;
   }
 
   async updateQuestionById(
@@ -87,20 +87,20 @@ class QuestionRepository {
     title: string,
     code: string
   ): Promise<schema.Question> {
-    const result = await db
+    const [result] = await db
       .update(schema.questions)
       .set({ title, code })
       .where(eq(schema.questions.id, id))
       .returning();
-    return result[0];
+    return result;
   }
 
   async deleteQuestionById(id: number): Promise<schema.Question> {
-    const result = await db
+    const [result] = await db
       .delete(schema.questions)
       .where(eq(schema.questions.id, id))
       .returning();
-    return result[0];
+    return result;
   }
 
   async countQuestions(
@@ -134,20 +134,20 @@ class QuestionRepository {
       );
     }
 
-    const result = await db
+    const [{ value: result }] = await db
       .select({ value: count() })
       .from(schema.questions)
       .innerJoin(schema.users, eq(schema.questions.userId, schema.users.id))
       .where(and(...conditions));
-    return result[0].value;
+    return result;
   }
 
   async countQuestionById(id: number): Promise<number> {
-    const result = await db
+    const [{ value: result }] = await db
       .select({ value: count() })
       .from(schema.questions)
       .where(eq(schema.questions.id, id));
-    return result[0].value;
+    return result;
   }
 }
 
