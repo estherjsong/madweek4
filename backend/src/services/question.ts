@@ -5,7 +5,7 @@ import questionRepository from '@repositories/question';
 import { type User } from '@src/schema';
 
 class QuestionService {
-  async validateQuestion(req: Request): Promise<void> {
+  async validateInput(req: Request): Promise<void> {
     await body('title', '제목을 작성해주세요.')
       .trim()
       .isString()
@@ -33,6 +33,18 @@ class QuestionService {
     await body('tags.*', '태그를 정상적으로 입력해주세요.')
       .optional()
       .custom((value) => 'id' in value || ('name' in value && 'type' in value))
+      .run(req);
+  }
+
+  async validateQuestion(req: Request): Promise<void> {
+    await param('id', '올바르지 않은 질문입니다.')
+      .isInt()
+      .toInt()
+      .custom(async (value: number) => {
+        if ((await questionRepository.countQuestionById(value)) === 0) {
+          throw new Error();
+        }
+      })
       .run(req);
   }
 

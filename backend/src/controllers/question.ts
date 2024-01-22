@@ -37,6 +37,11 @@ class QuestionController {
     const data = matchedData(req);
 
     try {
+      const count = await questionRepository.countQuestions(
+        data.title as string | undefined,
+        data.nickname as string | undefined,
+        data.tag as string | undefined
+      );
       const questions = await questionRepository.searchQuestions(
         10,
         data.offset as number,
@@ -50,22 +55,14 @@ class QuestionController {
           tags: await tagRepository.findTagsByQuestionId(question.id),
         }))
       );
-      res.status(200).json(questionWithTags);
+      res.status(200).json({ count, questions: questionWithTags });
     } catch (error) {
       next(error);
     }
   };
 
   getQuestion: RequestHandler = async (req, res, next) => {
-    await param('id', '올바르지 않은 질문입니다.')
-      .isInt()
-      .toInt()
-      .custom(async (value: number) => {
-        if ((await questionRepository.countQuestionById(value)) === 0) {
-          throw new Error();
-        }
-      })
-      .run(req);
+    await questionService.validateQuestion(req);
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -86,7 +83,7 @@ class QuestionController {
   };
 
   postQuestion: RequestHandler = async (req, res, next) => {
-    await questionService.validateQuestion(req);
+    await questionService.validateInput(req);
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -118,7 +115,7 @@ class QuestionController {
 
   putQuestion: RequestHandler = async (req, res, next) => {
     await questionService.validateWriter(req);
-    await questionService.validateQuestion(req);
+    await questionService.validateInput(req);
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

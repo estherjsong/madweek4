@@ -105,6 +105,45 @@ class QuestionRepository {
     return result[0];
   }
 
+  async countQuestions(
+    title?: string,
+    nickname?: string,
+    tag?: string
+  ): Promise<number> {
+    const conditions: SQLWrapper[] = [];
+
+    if (title !== undefined) {
+      conditions.push(ilike(schema.questions.title, `%${title}%`));
+    }
+
+    if (nickname !== undefined) {
+      conditions.push(ilike(schema.users.nickname, `%${nickname}%`));
+    }
+
+    if (tag !== undefined) {
+      conditions.push(
+        inArray(
+          schema.questions.id,
+          db
+            .selectDistinct({ questionId: schema.questionTags.questionId })
+            .from(schema.tags)
+            .where(ilike(schema.tags.name, `%${tag}%`))
+            .leftJoin(
+              schema.questionTags,
+              eq(schema.tags.id, schema.questionTags.tagId)
+            )
+        )
+      );
+    }
+
+    const result = await db
+      .select({ value: count() })
+      .from(schema.questions)
+      .innerJoin(schema.users, eq(schema.questions.userId, schema.users.id))
+      .where(and(...conditions));
+    return result[0].value;
+  }
+
   async countQuestionById(id: number): Promise<number> {
     const result = await db
       .select({ value: count() })
