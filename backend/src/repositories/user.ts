@@ -81,11 +81,12 @@ class UserRepository {
   async createUser(
     userId: string,
     password: string,
-    nickname: string
+    nickname: string,
+    introduction: string
   ): Promise<schema.User> {
     const [result] = await db
       .insert(schema.users)
-      .values({ userId, password, nickname })
+      .values({ userId, password, nickname, introduction })
       .returning();
     return result;
   }

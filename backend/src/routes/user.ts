@@ -28,6 +28,9 @@ const router = express.Router();
  *          nickname:
  *            type: string
  *            description: 유저 닉네임
+ *          introduction:
+ *            type: string
+ *            description: 한 줄 자기소개
  *          createdAt:
  *            type: string
  *            format: date-time
@@ -157,6 +160,9 @@ router.post('/logout', isAuthenticated, userController.postLogout);
  *                 nickname:
  *                   type: string
  *                   description: 가입할 유저 닉네임
+ *                 introduction:
+ *                   type: string
+ *                   description: 가입할 유저 자기소개
  *       responses:
  *         "201":
  *           description: 회원가입한 유저

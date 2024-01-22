@@ -92,7 +92,8 @@ class UserController {
       const user = await userRepository.createUser(
         data.userId,
         hash,
-        data.nickname
+        data.nickname,
+        data.introduction
       );
       req.logIn(user, (error) => {
         if (error != null) {

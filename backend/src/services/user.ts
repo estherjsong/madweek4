@@ -43,6 +43,11 @@ class UserService {
         }
       })
       .run(req);
+    await body('introduction', '자기소개를 작성하셔야 합니다.')
+      .trim()
+      .isString()
+      .notEmpty()
+      .run(req);
   }
 }
 
