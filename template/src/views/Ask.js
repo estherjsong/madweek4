@@ -10,14 +10,18 @@ import 'react-tagsinput/react-tagsinput.css'; // Import the styles for react-tag
 import TagsInput from 'react-tagsinput'; // Import the react-tagsinput component
 import { API_BASE_URL } from '../config';
 import language from './languages.json';
+import { useNavigate } from 'react-router-dom';
 
 const Ask = () => {
+    const navigate = useNavigate();
+
     const [langSelect, setLangSelect] = useState('javascript')
     const [formData, setFormData] = useState({
         title: '',
         code: '',
         tags: [{ name: 'javascript', type: 1 }],
     });
+    const [errors, setErrors] = useState({});
 
     const handleLanguageChange = (e) => {
         setLangSelect(e.target.value)
@@ -74,9 +78,27 @@ const Ask = () => {
             console.log("response", response)
 
             if (response.ok) {
+                navigate('/questions')
                 console.log('Qeustion post successful', result);
             } else {
                 console.log('Qeustion post failed:', result);
+                const newErrors = {};
+                result.errors.forEach((error) => {
+                    // error.msg에 따라 각각의 처리
+                    switch (error.msg) {
+                        case '제목을 작성해주세요.':
+                            newErrors.title = 'Please write a title.';
+                            break;
+                        case '코드를 작성해주세요.':
+                            newErrors.code = 'Please write the code.';
+                            break;
+                        default:
+                            // 처리하고자 하는 에러 메시지가 없을 경우 아무 작업도 하지 않음
+                            break;
+                    }
+                });
+                
+                setErrors(newErrors);
             }
         } catch (error) {
             console.error('An error occurred during posting:', error);
@@ -104,6 +126,7 @@ const Ask = () => {
                                     value={formData.title}
                                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                 />
+                                {errors.title && <div className="text-danger">{errors.title}</div>}
                             </FormGroup>
                             <FormGroup>
                                 <Label for="langSelect">Select Language</Label>
@@ -131,6 +154,7 @@ const Ask = () => {
                                     height={'500px'}
                                     extensions={[loadLanguage(langSelect)]}
                                 />
+                                {errors.code && <div className="text-danger">{errors.code}</div>}
                             </FormGroup>
                             {/* <FormGroup>
                                 <Label for="tags">Tags</Label>
