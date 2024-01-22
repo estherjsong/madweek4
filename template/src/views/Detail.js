@@ -117,12 +117,13 @@ const Detail = () => {
                                         <div>
                                             <Link to={`/edit/${post.id}`} className='me-3'>
                                                 <Button className="btn" color="primary" size="sm">
-                                                    <i className="bi bi-pencil-square me-1"> </i>
-                                                    <span className="d-none d-sm-inline"> Edit Question</span>
+                                                    <i className="bi bi-pencil-square"> </i>
+                                                    {/* <span className="d-none d-sm-inline"> Edit Question</span> */}
                                                 </Button>
                                             </Link>
-                                            <Button className="btn" color="primary" size="sm" onClick={toggle}>
+                                            <Button className="btn" color="primary" size="sm" onClick={toggle} color="danger">
                                                 <i className="bi bi-trash"> </i>
+                                                {/* <span className="d-none d-sm-inline"> Delete Question</span> */}
                                             </Button>
                                         </div>
                                     }
@@ -142,12 +143,21 @@ const Detail = () => {
                                     extensions={[loadLanguage(post.tags[0].name), EditorView.editable.of(false), EditorState.readOnly.of(true)]}
                                 />
 
-                                <Col xs='auto' className='ms-auto'>
-                                    <div className="d-flex flex-column">
-                                        <small className="text-muted ms-auto">{formatDateString(post.createdAt)}</small>
-                                        <small className="text-muted ms-auto">{post.user.nickname}</small>
-                                    </div>
-                                </Col>
+                                <Row>
+                                    <Col>
+                                        {post.tags.map((tag) => (
+                                            <Button className="btn me-2" outline color="primary" size="sm" onClick={() => { navigate(`/questions?tag=${tag.name}`) }}>
+                                                {tag.name}
+                                            </Button>
+                                        ))}
+                                    </Col>
+                                    <Col xs='auto' className='ms-auto'>
+                                        <div className="d-flex flex-column">
+                                            <small className="text-muted ms-auto">{formatDateString(post.createdAt)}</small>
+                                            <small className="text-muted ms-auto">{post.user.nickname}</small>
+                                        </div>
+                                    </Col>
+                                </Row>
                             </CardBody>
                         </Card>
                         {answersData.map((answer, index) => (
@@ -167,10 +177,12 @@ const Detail = () => {
                                     <CardText>
                                         {answer.content}
                                     </CardText>
-                                    <div className="d-flex justify-content-end me-2 flex-column ms-auto">
-                                        <small className="text-muted">{formatDateString(answer.timestamp)}</small>
-                                        <small className="text-muted">{answer.author}</small>
-                                    </div>
+                                    <Col xs='auto' className='ms-auto'>
+                                        <div className="d-flex flex-column">
+                                            <small className="text-muted ms-auto">{formatDateString(answer.timestamp)}</small>
+                                            <small className="text-muted ms-auto">{answer.author}</small>
+                                        </div>
+                                    </Col>
                                 </CardBody>
                             </Card>
                         ))}
