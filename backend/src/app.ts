@@ -9,9 +9,10 @@ import passport from 'passport';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUI from 'swagger-ui-express';
 
-import questionRoute from '@routes/question';
-import tagRoute from '@routes/tag';
-import userRoute from '@routes/user';
+import answerRouter from '@routes/answer';
+import questionRouter from '@routes/question';
+import tagRouter from '@routes/tag';
+import userRouter from '@routes/user';
 import logger from '@utils/logger';
 import { ENVIRONMENT, POSTGRES_URL, SESSION_SECRET } from '@utils/secret';
 
@@ -73,8 +74,9 @@ app.use(
 app.use(session(sess));
 app.use(passport.authenticate('session'));
 
-app.use('/', userRoute);
-app.use('/question', questionRoute);
-app.use('/tag', tagRoute);
+app.use('/', userRouter);
+app.use('/question', questionRouter);
+app.use('/tag', tagRouter);
+app.use('/answer', answerRouter);
 
 export default app;

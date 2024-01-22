@@ -58,15 +58,21 @@ const router = express.Router();
  *           content:
  *             application/json:
  *               schema:
- *                 type: array
- *                 items:
- *                   allOf:
- *                     - $ref: '#/components/schemas/Tag'
- *                     - type: object
- *                       properties:
- *                         count:
- *                           type: integer
- *                           description: 태그 사용 횟수
+ *                 type: object
+ *                 properties:
+ *                   count:
+ *                     type: integer
+ *                     description: 조건에 맞는 태그의 수
+ *                   tags:
+ *                     type: array
+ *                     items:
+ *                       allOf:
+ *                         - $ref: '#/components/schemas/Tag'
+ *                         - type: object
+ *                           properties:
+ *                             count:
+ *                               type: integer
+ *                               description: 태그 사용 횟수
  */
 router.get('/', tagController.getTags);
 

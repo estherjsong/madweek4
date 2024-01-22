@@ -30,13 +30,17 @@ class TagController {
     const data = matchedData(req);
 
     try {
+      const count = await tagRepository.countTags(
+        data.name as string | undefined,
+        data.type as number | undefined
+      );
       const tags = await tagRepository.searchTags(
         10,
         data.offset as number,
         data.name as string | undefined,
         data.type as number | undefined
       );
-      res.status(200).json(tags);
+      res.status(200).json({ count, tags });
     } catch (error) {
       next(error);
     }

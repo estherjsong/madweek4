@@ -110,6 +110,24 @@ class TagRepository {
       .returning();
     return result;
   }
+
+  async countTags(name?: string, type?: number): Promise<number> {
+    const conditions: SQLWrapper[] = [];
+
+    if (name !== undefined) {
+      conditions.push(ilike(schema.tags.name, `%${name}%`));
+    }
+
+    if (type !== undefined) {
+      conditions.push(eq(schema.tags.type, type));
+    }
+
+    const result = await db
+      .select({ value: count() })
+      .from(schema.tags)
+      .where(and(...conditions));
+    return result[0].value;
+  }
 }
 
 export default new TagRepository();

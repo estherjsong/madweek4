@@ -71,19 +71,25 @@ const router = express.Router();
  *           content:
  *             application/json:
  *               schema:
- *                 type: array
- *                 items:
- *                   allOf:
- *                     - $ref: '#/components/schemas/Question'
- *                     - type: object
- *                       properties:
- *                         user:
- *                           $ref: '#/components/schemas/User'
- *                         tags:
- *                           type: array
- *                           items:
- *                             $ref: '#/components/schemas/Tag'
- *                           description: 질문의 태그
+ *                 type: object
+ *                 properties:
+ *                   count:
+ *                     type: integer
+ *                     description: 조건에 맞는 질문의 수
+ *                   questions:
+ *                     type: array
+ *                     items:
+ *                       allOf:
+ *                         - $ref: '#/components/schemas/Question'
+ *                         - type: object
+ *                           properties:
+ *                             user:
+ *                               $ref: '#/components/schemas/User'
+ *                             tags:
+ *                               type: array
+ *                               items:
+ *                                 $ref: '#/components/schemas/Tag'
+ *                               description: 질문의 태그
  */
 router.get('/', questionController.getQuestions);
 
@@ -118,7 +124,7 @@ router.get('/', questionController.getQuestions);
  *                           $ref: '#/components/schemas/Tag'
  *                         description: 질문의 태그
  */
-router.get('/:id', questionController.getQuestion);
+router.get('/:id(\\d+)/', questionController.getQuestion);
 
 /**
  *  @swagger
@@ -210,7 +216,7 @@ router.post('/', isAuthenticated, questionController.postQuestion);
  *                           $ref: '#/components/schemas/Tag'
  *                         description: 질문의 태그
  */
-router.put('/:id', isAuthenticated, questionController.putQuestion);
+router.put('/:id(\\d+)/', isAuthenticated, questionController.putQuestion);
 
 /**
  *  @swagger
@@ -241,6 +247,10 @@ router.put('/:id', isAuthenticated, questionController.putQuestion);
  *                           $ref: '#/components/schemas/Tag'
  *                         description: 질문의 태그
  */
-router.delete('/:id', isAuthenticated, questionController.deleteQuestion);
+router.delete(
+  '/:id(\\d+)/',
+  isAuthenticated,
+  questionController.deleteQuestion
+);
 
 export default router;
