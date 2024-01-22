@@ -28,11 +28,54 @@ const router = express.Router();
  *          nickname:
  *            type: string
  *            description: 유저 닉네임
+ *          introduction:
+ *            type: string
+ *            description: 한 줄 자기소개
  *          createdAt:
  *            type: string
  *            format: date-time
  *            description: 회원가입한 날짜와 시각
  */
+
+/**
+ *  @swagger
+ *  paths:
+ *   /user/{id}:
+ *     get:
+ *       summary: 고유값에 해당하는 유저 반환
+ *       tags: [User]
+ *       parameters:
+ *         - in: path
+ *           name: id
+ *           schema:
+ *             type: integer
+ *           description: 유저의 고유값
+ *       responses:
+ *         "200":
+ *           description: 유저
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 allOf:
+ *                   - $ref: '#/components/schemas/User'
+ *                   - type: object
+ *                     properties:
+ *                       score:
+ *                         type: integer
+ *                         description: 유저의 점수
+ *                       topLanguages:
+ *                         type: array
+ *                         items:
+ *                           allOf:
+ *                             - $ref: '#/components/schemas/Tag'
+ *                             - type: object
+ *                               properties:
+ *                                 count:
+ *                                   type: integer
+ *                                   description: 질문 횟수
+ *                         description: 가장 많이 질문한 언어
+ */
+router.get('/user/:id(\\d+)/', userController.getUser);
 
 /**
  *  @swagger
@@ -117,6 +160,9 @@ router.post('/logout', isAuthenticated, userController.postLogout);
  *                 nickname:
  *                   type: string
  *                   description: 가입할 유저 닉네임
+ *                 introduction:
+ *                   type: string
+ *                   description: 가입할 유저 자기소개
  *       responses:
  *         "201":
  *           description: 회원가입한 유저

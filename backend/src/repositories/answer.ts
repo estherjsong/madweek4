@@ -10,7 +10,7 @@ class AnswerRepository {
     schema.Answer & { user: Omit<schema.User, 'password'>; like: number }
   > {
     const { password, ...user } = getTableColumns(schema.users);
-    const result = await db
+    const [result] = await db
       .select({
         ...getTableColumns(schema.answers),
         user,
@@ -24,7 +24,7 @@ class AnswerRepository {
       )
       .innerJoin(schema.users, eq(schema.answers.userId, schema.users.id))
       .groupBy(schema.answers.id, schema.users.id);
-    return result[0];
+    return result;
   }
 
   async findAnswersByQuestionId(
@@ -65,11 +65,11 @@ class AnswerRepository {
     questionId: number,
     userId: number
   ): Promise<schema.Answer> {
-    const result = await db
+    const [result] = await db
       .insert(schema.answers)
       .values({ code, questionId, userId })
       .returning();
-    return result[0];
+    return result;
   }
 
   async createComments(
@@ -99,7 +99,7 @@ class AnswerRepository {
     answerId: number,
     userId: number
   ): Promise<schema.AnswerLike> {
-    const result = await db
+    const [result] = await db
       .insert(schema.answerLikes)
       .values({ like, answerId, userId })
       .onConflictDoUpdate({
@@ -107,24 +107,24 @@ class AnswerRepository {
         set: { like: sql`excluded.like` },
       })
       .returning();
-    return result[0];
+    return result;
   }
 
   async updateAnswerById(id: number, code: string): Promise<schema.Answer> {
-    const result = await db
+    const [result] = await db
       .update(schema.answers)
       .set({ code })
       .where(eq(schema.answers.id, id))
       .returning();
-    return result[0];
+    return result;
   }
 
   async deleteAnswerById(id: number): Promise<schema.Answer> {
-    const result = await db
+    const [result] = await db
       .delete(schema.answers)
       .where(eq(schema.answers.id, id))
       .returning();
-    return result[0];
+    return result;
   }
 
   async deleteCommentsByIds(
@@ -150,7 +150,7 @@ class AnswerRepository {
     questionId: number,
     userId: number
   ): Promise<number> {
-    const result = await db
+    const [{ value: result }] = await db
       .select({ value: count() })
       .from(schema.answers)
       .where(
@@ -159,7 +159,7 @@ class AnswerRepository {
           eq(schema.answers.userId, userId)
         )
       );
-    return result[0].value;
+    return result;
   }
 }
 
