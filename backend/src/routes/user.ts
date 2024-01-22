@@ -25,9 +25,6 @@ const router = express.Router();
  *          userId:
  *            type: string
  *            description: 로그인할 때 사용되는 유저 아이디
- *          password:
- *            type: string
- *            description: 로그인할 때 사용되는 유저 비밀번호
  *          nickname:
  *            type: string
  *            description: 유저 닉네임
@@ -127,16 +124,6 @@ router.post('/logout', isAuthenticated, userController.postLogout);
  *             application/json:
  *               schema:
  *                 $ref: '#/components/schemas/User'
- *         "400":
- *           description: 회원가입 오류
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     desciprtion: 오류 메시지
  */
 router.post('/signup', userController.postSignup);
 

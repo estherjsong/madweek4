@@ -58,3 +58,48 @@ export const questionTags = pgTable(
 
 export type QuestionTag = typeof questionTags.$inferSelect;
 export type NewQuestionTag = typeof questionTags.$inferInsert;
+
+/*
+export const answers = pgTable(
+  'answers',
+  {
+    id: serial('id').primaryKey(),
+    title: text('title').notNull(),
+    code: text('code').notNull(),
+    questionId: integer('question_id').notNull(),
+    userId: integer('user_id').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => ({
+    unq: unique().on(t.questionId, t.userId),
+  })
+);
+
+export const answerComments = pgTable(
+  'answer_comments',
+  {
+    id: serial('id').primaryKey(),
+    answerId: integer('answer_id').notNull(),
+    line: integer('line').notNull(),
+    description: text('description').notNull(),
+  },
+  (t) => ({
+    unq: unique().on(t.answerId, t.line),
+  })
+);
+
+export const answerLikes = pgTable(
+  'answer_likes',
+  {
+    id: serial('id').primaryKey(),
+    like: integer('like').notNull(),
+    answerId: integer('answer_id').notNull(),
+    userId: integer('user_id').notNull(),
+  },
+  (t) => ({
+    unq: unique().on(t.answerId, t.userId),
+  })
+);
+*/

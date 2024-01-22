@@ -10,6 +10,7 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUI from 'swagger-ui-express';
 
 import questionRoute from '@routes/question';
+import tagRoute from '@routes/tag';
 import userRoute from '@routes/user';
 import logger from '@utils/logger';
 import { ENVIRONMENT, POSTGRES_URL, SESSION_SECRET } from '@utils/secret';
@@ -21,7 +22,7 @@ const sess: session.SessionOptions = {
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { sameSite: 'none', secure: true },
+  cookie: {},
   store: new PostgresqlStore({
     conString: POSTGRES_URL,
     createTableIfMissing: true,
@@ -30,9 +31,11 @@ const sess: session.SessionOptions = {
 
 if (ENVIRONMENT === 'production') {
   app.set('trust proxy', 1);
+  sess.cookie!.sameSite = 'none';
+  sess.cookie!.secure = true;
 }
 
-app.set('port', process.argv[2] ?? 3000);
+app.set('port', process.argv[2] ?? 80);
 
 app.use(
   '/api-docs',
@@ -51,9 +54,7 @@ app.use(
   )
 );
 
-if (ENVIRONMENT === 'production') {
-  app.use(helmet());
-}
+app.use(helmet());
 app.use(compression());
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
@@ -74,5 +75,6 @@ app.use(passport.authenticate('session'));
 
 app.use('/', userRoute);
 app.use('/question', questionRoute);
+app.use('/tag', tagRoute);
 
 export default app;

@@ -32,7 +32,7 @@ class UserRepository {
     return result[0];
   }
 
-  async countUserId(userId: string): Promise<number> {
+  async countUserByUserId(userId: string): Promise<number> {
     const result = await db
       .select({ value: count() })
       .from(schema.users)
@@ -40,7 +40,7 @@ class UserRepository {
     return result[0].value;
   }
 
-  async countNickname(nickname: string): Promise<number> {
+  async countUserByNickname(nickname: string): Promise<number> {
     const result = await db
       .select({ value: count() })
       .from(schema.users)

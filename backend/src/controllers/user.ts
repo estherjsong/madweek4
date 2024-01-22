@@ -26,7 +26,9 @@ class UserController {
             next(error);
             return;
           }
-          res.status(200).json(user);
+
+          const { password, ...userWithoutPassword } = user;
+          res.status(200).json(userWithoutPassword);
         });
       }
     )(req, res, next);
@@ -54,16 +56,6 @@ class UserController {
     const data: Record<string, string> = matchedData(req);
 
     try {
-      if ((await userRepository.countUserId(data.userId)) > 0) {
-        res.status(400).json({ message: '이미 존재하는 아이디입니다.' });
-        return;
-      }
-
-      if ((await userRepository.countNickname(data.nickname)) > 0) {
-        res.status(400).json({ message: '이미 존재하는 닉네임입니다.' });
-        return;
-      }
-
       const hash = await argon2.hash(data.password);
       const user = await userRepository.createUser(
         data.userId,
@@ -75,7 +67,9 @@ class UserController {
           next(error);
           return;
         }
-        res.status(201).json(user);
+
+        const { password, ...userWithoutPassword } = user;
+        res.status(201).json(userWithoutPassword);
       });
     } catch (error) {
       next(error);
