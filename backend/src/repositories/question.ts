@@ -17,12 +17,11 @@ class QuestionRepository {
     id: number
   ): Promise<schema.Question & { user: Omit<schema.User, 'password'> }> {
     const { password, ...user } = getTableColumns(schema.users);
-
     const result = await db
       .select({ ...getTableColumns(schema.questions), user })
       .from(schema.questions)
-      .innerJoin(schema.users, eq(schema.questions.userId, schema.users.id))
-      .where(eq(schema.questions.id, id));
+      .where(eq(schema.questions.id, id))
+      .innerJoin(schema.users, eq(schema.questions.userId, schema.users.id));
     return result[0];
   }
 
@@ -60,7 +59,6 @@ class QuestionRepository {
     }
 
     const { password, ...user } = getTableColumns(schema.users);
-
     const result = await db
       .select({ ...getTableColumns(schema.questions), user })
       .from(schema.questions)

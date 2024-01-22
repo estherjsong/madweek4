@@ -59,12 +59,10 @@ export const questionTags = pgTable(
 export type QuestionTag = typeof questionTags.$inferSelect;
 export type NewQuestionTag = typeof questionTags.$inferInsert;
 
-/*
 export const answers = pgTable(
   'answers',
   {
     id: serial('id').primaryKey(),
-    title: text('title').notNull(),
     code: text('code').notNull(),
     questionId: integer('question_id').notNull(),
     userId: integer('user_id').notNull(),
@@ -76,6 +74,9 @@ export const answers = pgTable(
     unq: unique().on(t.questionId, t.userId),
   })
 );
+
+export type Answer = typeof answers.$inferSelect;
+export type NewAnswer = typeof answers.$inferInsert;
 
 export const answerComments = pgTable(
   'answer_comments',
@@ -90,6 +91,9 @@ export const answerComments = pgTable(
   })
 );
 
+export type AnswerComment = typeof answerComments.$inferSelect;
+export type NewAnswerComment = typeof answerComments.$inferInsert;
+
 export const answerLikes = pgTable(
   'answer_likes',
   {
@@ -102,4 +106,6 @@ export const answerLikes = pgTable(
     unq: unique().on(t.answerId, t.userId),
   })
 );
-*/
+
+export type AnswerLike = typeof answerLikes.$inferSelect;
+export type NewAnswerLike = typeof answerLikes.$inferInsert;
