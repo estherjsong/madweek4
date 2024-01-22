@@ -1,4 +1,4 @@
-import { Row, Col, Table, Card, CardTitle, CardBody, Pagination, PaginationItem, PaginationLink, Button } from "reactstrap";
+import { Row, Col, Table, Card, CardTitle, CardBody, Pagination, PaginationItem, PaginationLink, Button, Input, InputGroup, ButtonDropdown, Dropdown, DropdownToggle, DropdownItem, DropdownMenu } from "reactstrap";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from 'axios';
@@ -20,6 +20,13 @@ const Questions = () => {
     const [posts, setPosts] = useState([]);
     const [totalPages, setTotalPages] = useState(1);
 
+    const [searchSelect, setSearchSelect] = useState('All');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+
+    const toggle = () => setDropdownOpen((prevState) => !prevState);
+
     // Calculate total number of pages
     // const totalPages = Math.ceil(dummyData.length / postsPerPage);
 
@@ -27,33 +34,35 @@ const Questions = () => {
     const indexOfLast = currentPage * postsPerPage;
     const indexOfFirst = indexOfLast - postsPerPage;
 
-    const currentPosts = dummyData.slice(indexOfFirst, indexOfLast);
+    const fetchData = async (params) => {
+        try {
+            // Define the base parameters
+            const baseParams = {
+                offset: indexOfFirst,
+                // Add other common parameters here
+            };
+
+            // Conditionally add title, nickname, and tag based on params
+            if (params.title) baseParams.title = params.title;
+            if (params.nickname) baseParams.nickname = params.nickname;
+            if (params.tag) baseParams.tag = params.tag;
+
+            // Send a GET request with the constructed parameters
+            const response = await axios.get(`/question`, { params: baseParams });
+
+            // Set the fetched posts to the state
+            console.log(response);
+            setPosts(response.data.questions);
+            setTotalPages(Math.ceil(response.data.count / postsPerPage));
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
 
     useEffect(() => {
         // Define your function to fetch data
-        const fetchData = async () => {
-            try {
-                // Send a GET request with the offset parameter
-                const response = await axios.get(`/question`, {
-                    params: {
-                        offset: indexOfFirst,
-                        // Add other parameters as needed
-                    },
-                });
-
-                console.log('response', response);
-                console.log('response.data.questions', response.data.questions);
-                // Set the fetched posts to the state
-                setPosts(response.data.questions);
-                setTotalPages(Math.ceil(response.data.count / postsPerPage));
-                console.log("posts, count, TotalPages", posts, response.data.count, totalPages);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-
         // Call the fetchData function when the component mounts or currentPage changes
-        fetchData();
+        fetchData({});
     }, [currentPage, indexOfFirst, postsPerPage]);
 
     // Handle page change
@@ -63,22 +72,80 @@ const Questions = () => {
         }
     };
 
+    const handleSearch = () => {
+        const params = {
+            title: searchSelect === 'Title' ? searchTerm : undefined,
+            nickname: searchSelect === 'Author' ? searchTerm : undefined,
+            tag: searchSelect === 'Tag' ? searchTerm : undefined,
+        };
+
+        fetchData(params);
+    };
+
     return (
         <Row>
             <Col lg="12">
+
+
                 <Card>
-                    <CardTitle tag="h6" className="border-bottom p-1 mb-0 d-flex justify-content-between">
+                    <CardTitle tag="h6" className="border-bottom p-1 mb-0 d-flex justify-content-between flex-column flex-sm-row">
                         <div className="p-2">
                             <i className="bi bi-card-text me-2"> </i>
                             Questions
                         </div>
-                        <Link to="/ask" className="me-2">
-                            <Button className="btn" color="primary" size="sm">
-                                <i className="bi bi-plus"> </i>
-                                Add Question
-                            </Button>
-                        </Link>
+
+                        <div className="d-flex align-items-center">
+                            {/* Add the grid classes to control the width of elements */}
+
+                            {searchOpen ? (
+                                <div className="">
+                                    <InputGroup size="sm">
+                                        <Dropdown isOpen={dropdownOpen} toggle={toggle}>
+                                            <DropdownToggle caret>{searchSelect}</DropdownToggle>
+                                            <DropdownMenu className="me-3">
+                                                <DropdownItem onClick={() => setSearchSelect('All')}>All</DropdownItem>
+                                                <DropdownItem onClick={() => setSearchSelect('Title')}>Title</DropdownItem>
+                                                <DropdownItem onClick={() => setSearchSelect('Tag')}>Tag</DropdownItem>
+                                                <DropdownItem onClick={() => setSearchSelect('Author')}>Author</DropdownItem>
+                                            </DropdownMenu>
+                                        </Dropdown>
+                                        <Input
+                                            placeholder="Search"
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    handleSearch();
+                                                }
+                                            }}
+                                        />
+                                        <Button onClick={() => handleSearch()}>
+                                            <i className="bi bi-search"></i>
+                                        </Button>
+                                        <Button onClick={() => { setSearchOpen(false); fetchData({}) }} className="me-3 border-0 bg-transparent" size="sm">
+                                            <i className="bi bi-x text-dark"> </i>
+                                        </Button>
+                                    </InputGroup>
+                                </div>
+                            ) : (
+                                <Button onClick={() => { setSearchOpen(true) }} className="me-3 border-0 bg-transparent" size="sm">
+                                    <i className="bi bi-search text-dark"> </i>
+                                </Button>
+                            )}
+
+
+                            <div className="me-3">
+                                <Link to="/ask">
+                                    <Button className="btn" color="primary" size="sm">
+                                        <i className="bi bi-plus"> </i>
+                                        <span className="d-none d-sm-inline"> Add Question</span>
+                                    </Button>
+                                </Link>
+                            </div>
+                        </div>
                     </CardTitle>
+
+
                     <CardBody className="">
                         <Table hover>
                             <thead>
