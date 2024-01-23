@@ -50,6 +50,14 @@ class AnswerRepository {
     return result;
   }
 
+  async findAnswersByUserId(userId: number): Promise<schema.Answer[]> {
+    const result = await db
+      .select()
+      .from(schema.answers)
+      .where(eq(schema.answers.userId, userId));
+    return result;
+  }
+
   async findCommentsByAnswerId(
     answerId: number
   ): Promise<schema.AnswerComment[]> {

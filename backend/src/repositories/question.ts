@@ -25,6 +25,14 @@ class QuestionRepository {
     return result;
   }
 
+  async findQuestionsByUserId(userId: number): Promise<schema.Question[]> {
+    const result = await db
+      .select()
+      .from(schema.questions)
+      .where(eq(schema.questions.userId, userId));
+    return result;
+  }
+
   async searchQuestions(
     limit: number,
     offset: number,

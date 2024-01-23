@@ -42,7 +42,7 @@ const router = express.Router();
  *  paths:
  *   /user/{id}:
  *     get:
- *       summary: 고유값에 해당하는 유저 반환
+ *       summary: 고유값에 해당하는 유저 정보 반환
  *       tags: [User]
  *       parameters:
  *         - in: path
@@ -52,7 +52,7 @@ const router = express.Router();
  *           description: 유저의 고유값
  *       responses:
  *         "200":
- *           description: 유저
+ *           description: 유저 정보
  *           content:
  *             application/json:
  *               schema:
@@ -74,6 +74,14 @@ const router = express.Router();
  *                                   type: integer
  *                                   description: 질문 횟수
  *                         description: 가장 많이 질문한 언어
+ *                       questions:
+ *                         type: array
+ *                         items:
+ *                           $ref: '#/components/schemas/Question'
+ *                       answers:
+ *                         type: array
+ *                         items:
+ *                           $ref: '#/components/schemas/Answer'
  */
 router.get('/user/:id(\\d+)/', userController.getUser);
 
