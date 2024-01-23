@@ -1,5 +1,5 @@
 import { type RequestHandler } from 'express';
-import { matchedData, param, query, validationResult } from 'express-validator';
+import { matchedData, query, validationResult } from 'express-validator';
 
 import tagRepository from '@repositories/tag';
 import tagService from '@services/tag';
@@ -102,16 +102,17 @@ class QuestionController {
         user.id
       );
 
-      if (data.isRequestAI && false) {
-        questionService.createAIAnswer(question, tags);
-      }
-
       await tagRepository.createQuestionTags(
         question.id,
         tags.map((tag) => tag.id)
       );
 
-      res.status(201).json({ ...question, tags });
+      // 사용량 깎이므로 일단 막아놓음 내 돈...
+      if (data.isRequestAI && false) {
+        await questionService.pipelineAIAnswer(question, tags, res);
+      } else {
+        res.status(201).json({ ...question, tags });
+      }
     } catch (error) {
       next(error);
     }

@@ -1,23 +1,18 @@
-import { parse } from 'partial-json';
-
-import logger from '@src/utils/logger';
-import { OPENAI_API_KEY } from '@src/utils/secret';
+import logger from '@utils/logger';
+import { OPENAI_API_KEY } from '@utils/secret';
 
 export async function createLLMAnswer(
   language: string,
   request: string,
   code: string
-): Promise<{
-  code: string;
-  comments: Array<{ line: number; description: string }>;
-}> {
+): Promise<ReadableStream<Uint8Array>> {
   const { ChatOpenAI } = await import('@langchain/openai');
   const { ChatPromptTemplate } = await import('@langchain/core/prompts');
-  const { StringOutputParser } = await import('@langchain/core/output_parsers');
+  const { HttpResponseOutputParser } = await import('langchain/output_parsers');
 
   const chatModel = new ChatOpenAI({
     openAIApiKey: OPENAI_API_KEY,
-    modelName: 'gpt-4-1106-preview',
+    // modelName: 'gpt-4-1106-preview',
     temperature: 0.1,
   });
   const prompt = ChatPromptTemplate.fromMessages([
@@ -56,25 +51,12 @@ export async function createLLMAnswer(
     ['user', '{input}'],
   ]);
 
-  const chain = prompt.pipe(chatModel).pipe(new StringOutputParser());
+  const chain = prompt.pipe(chatModel).pipe(new HttpResponseOutputParser());
   const input = JSON.stringify({ language, request, code });
 
   logger.info(
     'An AI response request was received with the following input: ' + input
   );
 
-  const stream = await chain.stream({ input });
-  let message = '';
-
-  for await (const chunk of stream) {
-    process.stdout.write(chunk);
-    message += chunk;
-  }
-  process.stdout.write('\n');
-
-  logger.info('The AI output the following response: ' + message);
-
-  return parse(
-    message.substring(message.indexOf('{'), message.lastIndexOf('}') + 1)
-  );
+  return await chain.stream({ input });
 }

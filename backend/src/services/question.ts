@@ -1,10 +1,15 @@
+import { Transform } from 'stream';
+import { pipeline } from 'stream/promises';
+
 import { type Request } from 'express';
 import { body, param } from 'express-validator';
+import { parse } from 'partial-json';
 
+import { createLLMAnswer } from '@config/langchain';
 import answerRepository from '@repositories/answer';
 import questionRepository from '@repositories/question';
-import { createLLMAnswer } from '@src/config/langchain';
 import { type Question, type Tag, type User } from '@src/schema';
+import logger from '@utils/logger';
 
 class QuestionService {
   async validateInput(req: Request): Promise<void> {
@@ -70,15 +75,46 @@ class QuestionService {
       .run(req);
   }
 
-  async createAIAnswer(question: Question, tags: Tag[]): Promise<void> {
+  async pipelineAIAnswer(
+    question: Question,
+    tags: Tag[],
+    res: NodeJS.WritableStream
+  ): Promise<void> {
     const language = tags.find((tag) => tag.type === 1)?.name;
     if (language === undefined) return;
 
-    const aiAnswer = await createLLMAnswer(
+    const stream = await createLLMAnswer(
       language,
       question.title,
       question.code
     );
+
+    let message = '';
+
+    await pipeline(
+      stream,
+      new Transform({
+        construct(callback) {
+          this.push(JSON.stringify({ ...question, tags }));
+          callback();
+        },
+        transform(chunk, _, callback) {
+          message += chunk;
+          callback(null, chunk);
+        },
+      }),
+      res
+    );
+
+    logger.info('The AI output the following response: ' + message);
+
+    const aiAnswer: {
+      code: string;
+      comments: Array<{ line: number; description: string }>;
+    } = parse(
+      message.substring(message.indexOf('{'), message.lastIndexOf('}') + 1)
+    );
+
     const answer = await answerRepository.createAnswer(
       aiAnswer.code,
       question.id,
