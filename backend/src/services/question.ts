@@ -1,8 +1,10 @@
 import { type Request } from 'express';
 import { body, param } from 'express-validator';
 
+import answerRepository from '@repositories/answer';
 import questionRepository from '@repositories/question';
-import { type User } from '@src/schema';
+import { createLLMAnswer } from '@src/config/langchain';
+import { type Question, type Tag, type User } from '@src/schema';
 
 class QuestionService {
   async validateInput(req: Request): Promise<void> {
@@ -34,6 +36,12 @@ class QuestionService {
       .optional()
       .custom((value) => 'id' in value || ('name' in value && 'type' in value))
       .run(req);
+    await body('isRequestAI', 'AI 요청 여부를 정상적으로 입력해주세요.')
+      .optional()
+      .default(false)
+      .isBoolean()
+      .toBoolean()
+      .run(req);
   }
 
   async validateQuestion(req: Request): Promise<void> {
@@ -60,6 +68,29 @@ class QuestionService {
         }
       })
       .run(req);
+  }
+
+  async createAIAnswer(question: Question, tags: Tag[]): Promise<void> {
+    const language = tags.find((tag) => tag.type === 1)?.name;
+    if (language === undefined) return;
+
+    const aiAnswer = await createLLMAnswer(
+      language,
+      question.title,
+      question.code
+    );
+    const answer = await answerRepository.createAnswer(
+      aiAnswer.code,
+      question.id,
+      1 // TODO: 임시로 넣은 유저 고유값. 나중에 인공지능 전용으로 계정 하나 만들어야 함
+    );
+    await answerRepository.createComments(
+      answer.id,
+      aiAnswer.comments.filter(
+        (comment, index) =>
+          aiAnswer.comments.findIndex((e) => e.line === comment.line) === index
+      )
+    );
   }
 }
 

@@ -102,6 +102,10 @@ class QuestionController {
         user.id
       );
 
+      if (data.isRequestAI && false) {
+        questionService.createAIAnswer(question, tags);
+      }
+
       await tagRepository.createQuestionTags(
         question.id,
         tags.map((tag) => tag.id)

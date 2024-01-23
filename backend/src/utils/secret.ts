@@ -33,3 +33,4 @@ export const SESSION_SECRET = process.env.SESSION_SECRET!;
 export const POSTGRES_URL = prod
   ? process.env.POSTGRES_URL!
   : process.env.POSTGRES_URL_LOCAL!;
+export const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
