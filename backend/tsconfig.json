@@ -4,13 +4,13 @@
     "baseUrl": ".",
     "outDir": "./dist",
     "paths": {
-      "@src/*": ["src/*"],
       "@config/*": ["src/config/*"],
       "@controllers/*": ["src/controllers/*"],
       "@repositories/*": ["src/repositories/*"],
       "@routes/*": ["src/routes/*"],
       "@services/*": ["src/services/*"],
       "@utils/*": ["src/utils/*"],
+      "@src/*": ["src/*"],
     },
   },
 }

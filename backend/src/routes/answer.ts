@@ -7,8 +7,8 @@
 
 import express from 'express';
 
+import { isAuthenticated } from '@config/passport';
 import answerController from '@controllers/answer';
-import { isAuthenticated } from '@src/config/passport';
 
 const router = express.Router();
 

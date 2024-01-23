@@ -8,7 +8,7 @@ import {
   sql,
 } from 'drizzle-orm';
 
-import db from '@src/db';
+import db from '@config/db';
 import * as schema from '@src/schema';
 
 class UserRepository {
