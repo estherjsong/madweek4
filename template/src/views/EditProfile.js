@@ -148,7 +148,7 @@ const RegisterForm = ({ isVisible, onClose, onLog }) => {
             <Card isVisible={isVisible} onClick={(e) => e.stopPropagation()} style={{ width: '40%' }}>
                 <CardTitle tag="h6" className="border-bottom p-3 mb-0">
                     <i class="bi bi-pencil-square">  </i>
-                    Register
+                    Edit Profile
                 </CardTitle>
                 <CardBody>
                     <Form>

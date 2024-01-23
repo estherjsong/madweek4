@@ -1,0 +1,36 @@
+.highlighted {
+    box-shadow: 0 0 10px #a3c3ff;
+    opacity: 1;
+    /* Ensure opacity is initially set to 1 */
+    /* Add a glowing effect with a soft yellow color */
+    transition: box-shadow 0.5s ease, opacity 0.5s ease;
+    /* Add smooth transitions for box-shadow and opacity */
+}
+
+.btn-hover {
+    color: transparent;
+    height: 23.5px;
+    width: 23.5px;
+    padding: 0;
+}
+
+.btn-hover:hover {
+    background-color: black;
+    color: white;
+    border-color: transparent;
+}
+
+.btn-hover.selected {
+    /* 선택된 상태의 스타일 */
+    background-color: transparent;
+    color: black;
+    border-color: black;
+}
+
+.btn-hover.hidden {
+    visibility: hidden;
+}
+
+.codeCommentInput {
+    border-width: 0;
+}

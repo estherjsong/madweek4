@@ -1,6 +1,6 @@
-import React, { Suspense, useState, useEffect } from 'react';
+import React, { Suspense, useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { Card, Row, Col, CardTitle, CardBody, CardText, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { Card, Row, Col, CardTitle, CardBody, CardText, Button, Modal, ModalHeader, Form, FormGroup, Label, ModalBody, ModalFooter, Input, UncontrolledPopover, PopoverBody } from 'reactstrap';
 import CodeMirror from '@uiw/react-codemirror';
 import { darcula } from '@uiw/codemirror-themes-all';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
@@ -16,43 +16,96 @@ import { EditorState } from '@codemirror/state';
 import axios from 'axios';
 import Loader from '../layouts/loader/Loader';
 import { formatDateString } from '../dateUtils';
+import './animation.css'
 
 const Detail = () => {
     const id = localStorage.getItem('id');
     console.log("userid", id)
-    const answersData = [
-        {
-            id: 1,
-            author: 'John Doe',
-            timestamp: '2024-01-21T10:30:00Z',
-            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-            startLineNumber: 3,  // Add the start line number
-            endLineNumber: 7,    // Add the end line number
-        },
-        {
-            id: 2,
-            author: 'Jane Doe',
-            timestamp: '2024-01-21T12:45:00Z',
-            content: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            startLineNumber: 6,  // Add the start line number
-            endLineNumber: 9,    // Add the end line number
-        },
-        {
-            id: 3,
-            author: 'Alice Smith',
-            timestamp: '2024-01-22T08:15:00Z',
-            content: 'A new answer from another user.',
-            startLineNumber: 5,  // Add the start line number
-            endLineNumber: 6,    // Add the end line number
-        },
-        // Add more dummy answers as needed
-    ];
 
     const { questionId } = useParams();
     const [post, setPost] = useState();
     const [loading, setLoading] = useState(true); // Track loading state
     const [modal, setModal] = useState(false);
     const navigate = useNavigate();
+    const codeMirrorRef = useRef(null);
+    const [selectedLine, setSelectedLine] = useState(0);
+    const [codeMirrorTop, setCodeMirrorTop] = useState(0);
+    const answerCardsContainerRef = useRef(null);
+    const [comments, setComments] = useState([]);
+    const [description, setDescription] = useState('');
+    const [code, setCode] = useState('');
+    const [answersList, setAnswersList] = useState([]);
+
+    const [lookingLines, setLookingLines] = useState([]);
+    const [lineCounts, setLineCounts] = useState([]);
+    const [lineCount, setLineCount] = useState(0);
+
+    const handleButtonClick = (lineNumber) => {
+        console.log(`Button clicked for Line ${lineNumber}`);
+
+        setSelectedLine(lineNumber);
+        setDescription(comments.find(comment => comment.line === lineNumber)?.description);
+        if (codeMirrorRef.current) {
+            const view = codeMirrorRef.current.view;
+            const tr = view.state.update({
+                selection: {
+                    anchor: view.state.doc.line(lineNumber).from,
+                    head: view.state.doc.line(lineNumber).to,
+                },
+            });
+            view.dispatch(tr);
+        }
+    };
+
+    const handleChange = (editor, data, value) => {
+        setCode(editor)
+    };
+
+    const handleAnswerPost = async () => {
+        console.log(comments);
+        try {
+            const response = await fetch(`${API_BASE_URL}/answer/${questionId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    code: code,
+                    comments: comments,
+                }),
+            })
+            const result = await response.json();
+
+            console.log("response", response)
+
+            if (response.ok) {
+                console.log('Answer post successful', result);
+            } else {
+                console.log('Answer post failed:', result);
+            }
+        } catch (error) {
+            console.error('An error occurred during posting:', error);
+            // 여기에서 적절한 에러 처리를 수행할 수 있습니다.
+        }
+    }
+
+    const updateLineCount = (answerIndex, count) => {
+        setLineCounts((prevLineCounts) => {
+            const updatedLineCounts = [...prevLineCounts];
+            updatedLineCounts[answerIndex] = count;
+            return updatedLineCounts;
+        });
+        console.log("lineCounts", lineCounts);
+    };
+
+    const setLookingLine = (answerIndex, lineNumber) => {
+        setLookingLines((prevLookingLines) => {
+            const updatedLookingLines = [...prevLookingLines];
+            updatedLookingLines[answerIndex] = lineNumber;
+            return updatedLookingLines;
+        });
+    };
 
     const toggle = () => setModal(!modal);
 
@@ -71,7 +124,24 @@ const Detail = () => {
             }
         };
 
+        const fetchAnswers = async () => {
+            try {
+                const response = await axios.get(`/answer/${questionId}`);
+                setAnswersList(response.data);
+                console.log("fetchComments", response.data);
+                response.data.forEach((answer, index) => {
+                    const codeString = answer.code || '';
+                    const lines = (codeString.match(/\n/g) || []).length + 1;
+                    updateLineCount(index, lines)
+                })
+                // console.log(typeof id, typeof post.userId, parseInt(id)===post.userId)
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
         // Call the fetchData function when the component mounts or currentPage changes
+        fetchAnswers();
         fetchData();
     }, [questionId]); // Include questionId as a dependency
 
@@ -118,12 +188,10 @@ const Detail = () => {
                                             <Link to={`/edit/${post.id}`} className='me-3'>
                                                 <Button className="btn" color="primary" size="sm">
                                                     <i className="bi bi-pencil-square"> </i>
-                                                    {/* <span className="d-none d-sm-inline"> Edit Question</span> */}
                                                 </Button>
                                             </Link>
-                                            <Button className="btn" color="primary" size="sm" onClick={toggle} color="danger">
+                                            <Button className="btn" size="sm" onClick={toggle} color="danger">
                                                 <i className="bi bi-trash"> </i>
-                                                {/* <span className="d-none d-sm-inline"> Delete Question</span> */}
                                             </Button>
                                         </div>
                                     }
@@ -160,32 +228,181 @@ const Detail = () => {
                                 </Row>
                             </CardBody>
                         </Card>
-                        {answersData.map((answer, index) => (
-                            <Card>
-                                <CardTitle tag="h6" className="border-bottom p-1 mb-0 d-flex justify-content-between">
-                                    <div className='p-2'>
-                                        {/* <i className="bi bi-chevron-left me-2"></i> */}
-                                        # {index + 1} Answer
-                                    </div>
-                                    <Button className="btn me-2" outline color="primary" size="sm">
-                                        <i className="bi bi-hand-thumbs-up me-2"> </i>
-                                        {/* <i className ="bi bi-hand-thumbs-up-fill me-2"></i> */}
-                                        6
-                                    </Button>
-                                </CardTitle>
-                                <CardBody>
-                                    <CardText>
-                                        {answer.content}
-                                    </CardText>
-                                    <Col xs='auto' className='ms-auto'>
-                                        <div className="d-flex flex-column">
-                                            <small className="text-muted ms-auto">{formatDateString(answer.timestamp)}</small>
-                                            <small className="text-muted ms-auto">{answer.author}</small>
+
+                        {/* <span className='ms-auto me-auto'>Go to answer this question</span> */}
+
+                        <div ref={answerCardsContainerRef}>
+                            {answersList.map((answer, index) => (
+                                <Card id={`answerCard_${answer.id}`} key={index}>
+                                    <CardTitle tag="h6" className="border-bottom p-1 mb-0 d-flex justify-content-between">
+                                        <div className='p-2'>
+                                            {/* <i className="bi bi-chevron-left me-2"></i> */}
+                                            # {index + 1} &nbsp; Answer
                                         </div>
+                                        <Button className="btn me-2" outline color="primary" size="sm">
+                                            <i className="bi bi-hand-thumbs-up me-2"> </i>
+                                            {/* <i className ="bi bi-hand-thumbs-up-fill me-2"></i> */}
+                                            {answer.like}
+                                        </Button>
+                                    </CardTitle>
+                                    <CardBody>
+                                        <Row>
+                                            <Col sm="7" lg="8" xl="8" xxl="8">
+                                                <CodeMirror
+                                                    className='mb-3'
+                                                    id="code"
+                                                    value={answer.code}
+                                                    theme={darcula}
+                                                    minHeight={'100px'}
+                                                    extensions={[
+                                                        loadLanguage(post.tags[0].name),
+                                                        EditorView.editable.of(false),
+                                                        EditorState.readOnly.of(true),
+                                                    ]}
+                                                />
+                                            </Col>
+                                            <Col sm="5" lg="4" xl="4" xxl="4" className="d-flex flex-column">
+                                                {Array.from({ length: lineCounts[index] || 0 }, (_, lineNumber) => (
+                                                    <div>
+                                                        <Button
+                                                            className={`btn-hover ${lookingLines[index] === lineNumber ? 'selected' : ''} ${!answer.comments.find(comment => comment.line === lineNumber + 1)?.description ? 'hidden' : ''}`}
+                                                            outline
+                                                            color='black'
+                                                            id={`LookingClick_${index}${lineNumber}`}
+                                                            key={lineNumber}
+                                                            onClick={() => setLookingLine(index, lineNumber)}
+                                                        >
+                                                            <i className="bi bi-chevron-right"> </i>
+                                                        </Button>
+                                                        {document.getElementById(`LookingClick_${index}${lineNumber}`) && (
+                                                            <UncontrolledPopover
+                                                                placement="right"
+                                                                target={`LookingClick_${index}${lineNumber}`}
+                                                                trigger="legacy"
+                                                                isOpen={lookingLines[index] === parseInt(lineNumber)}
+                                                                style={{ backgroundColor: 'white', borderRadius: '10px' }}
+                                                            >
+                                                                <PopoverBody className="d-flex">
+                                                                    {/* Assuming answersData is an array containing objects with properties line and content */}
+                                                                    {answer.comments.find(comment => comment.line === lineNumber + 1)?.description}
+                                                                </PopoverBody>
+                                                            </UncontrolledPopover>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </Col>
+                                        </Row>
+                                        <Col xs='auto' className='ms-auto'>
+                                            <div className="d-flex flex-column">
+                                                <small className="text-muted ms-auto">{formatDateString(answer.createdAt)}</small>
+                                                <small className="text-muted ms-auto">{answer.user.nickname}</small>
+                                            </div>
+                                        </Col>
+                                    </CardBody>
+                                </Card>
+                            ))}
+                        </div>
+
+                        <Card id={`answerCard_newAnswerCard`}>
+                            <CardTitle tag="h6" className="border-bottom p-1 mb-0 d-flex justify-content-between">
+                                <div className='p-2'>
+                                    <i className="bi bi-plus me-2"> </i>
+                                    New Answer
+                                </div>
+                                <Button className="btn me-2" color="primary" size="sm"
+                                    onClick={handleAnswerPost}>
+                                    post
+                                </Button>
+                            </CardTitle>
+                            <CardBody>
+                                <Row>
+                                    <Col sm="7" lg="8" xl="8" xxl="8">
+                                        <CodeMirror
+                                            ref={codeMirrorRef}
+                                            theme={darcula}
+                                            minHeight={'150px'}
+                                            onChange={handleChange}
+                                            extensions={[
+                                                loadLanguage(post.tags[0].name),
+                                                EditorView.updateListener.of((update) => {
+                                                    if (update.docChanged) {
+                                                        setLineCount(update.state.doc.lines);
+                                                    }
+                                                }),
+                                            ]}
+                                        />
                                     </Col>
-                                </CardBody>
-                            </Card>
-                        ))}
+                                    <Col sm="5" lg="4" xl="4" xxl="4" className="d-flex flex-column">
+                                        {Array.from({ length: lineCount }, (_, index) => index + 1).map((lineNumber) => (
+                                            <div>
+                                                <Button
+                                                    className={`btn-hover ${selectedLine === lineNumber ? 'selected' : ''}`}
+                                                    outline
+                                                    color='black'
+                                                    id={`PopoverClick_${lineNumber}`}
+                                                    key={lineNumber}
+                                                    onClick={() => handleButtonClick(lineNumber)}
+                                                >
+                                                    <i className="bi bi-plus"> </i>
+                                                </Button>
+                                                <span>{Array.from(comments).find(comment => comment.line === lineNumber)?.description}</span>
+                                                <UncontrolledPopover
+                                                    placement="right"
+                                                    target={`PopoverClick_${lineNumber}`}
+                                                    trigger="legacy"
+                                                    isOpen={selectedLine === parseInt(lineNumber)}
+                                                    style={{ backgroundColor: 'white', borderRadius: '10px' }}
+                                                >
+                                                    <PopoverBody className="d-flex">
+                                                        {/* Assuming answersData is an array containing objects with properties line and content */}
+                                                        <Input
+                                                            id="title"
+                                                            name="title"
+                                                            placeholder="with a placeholder"
+                                                            type="textarea"
+                                                            style={{ minHeight: '100px', marginRight: '10px' }}
+                                                            value={description}
+                                                            onChange={(e) => {
+                                                                setDescription(e.target.value);
+                                                            }}
+                                                        />
+                                                        <Button
+                                                            style={{
+                                                                backgroundColor: 'transparent',
+                                                                color: 'black',
+                                                                borderColor: 'transparent',
+                                                                width: '30px', // 버튼의 너비 조정 (조절 가능)
+                                                                padding: '0',
+                                                            }}
+                                                            onClick={() => {
+                                                                setComments((prevComments) => {
+                                                                    const updatedComments = [...prevComments];
+                                                                    const existingCommentIndex = updatedComments.findIndex(comment => comment.line === lineNumber);
+
+                                                                    if (existingCommentIndex !== -1) {
+                                                                        // If a comment for the lineNumber already exists, update its description
+                                                                        updatedComments[existingCommentIndex].description = description;
+                                                                    } else {
+                                                                        // If there's no comment for the lineNumber, create a new comment
+                                                                        updatedComments.push({ line: lineNumber, description: description });
+                                                                    }
+
+                                                                    return updatedComments;
+                                                                });
+                                                                console.log(comments)
+                                                            }}
+                                                        >
+                                                            <i className="bi bi-check-circle-fill"></i>
+                                                        </Button>
+                                                    </PopoverBody>
+                                                </UncontrolledPopover>
+                                            </div>
+                                        ))}
+                                    </Col>
+                                </Row>
+                            </CardBody>
+                        </Card>
+
                         <Modal isOpen={modal} toggle={toggle}>
                             <ModalHeader toggle={toggle}>Question Deletion</ModalHeader>
                             <ModalBody>

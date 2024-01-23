@@ -135,7 +135,9 @@ const Header = () => {
             {isLoggedIn && (
               <>
                 <DropdownItem header>Info</DropdownItem>
-                <DropdownItem>My Account</DropdownItem>
+                <Link to={'/mypage'} style={{textDecoration: 'none'}}>
+                  <DropdownItem>My Account</DropdownItem>
+                </Link>
                 <DropdownItem>Edit Profile</DropdownItem>
                 <DropdownItem divider />
               </>

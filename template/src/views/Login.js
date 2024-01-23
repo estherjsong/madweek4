@@ -80,6 +80,7 @@ const LoginForm = ({ isVisible, onClose, onReg }) => {
                     localStorage.setItem('userId', result.userId)
                     localStorage.setItem('nickname', result.nickname)
                     localStorage.setItem('id', result.id)
+                    localStorage.setItem('introductioin', result.introduction)
 
                     // cookie.save('userId',result.userId, {
                     //     path: '/',
