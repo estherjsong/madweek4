@@ -60,6 +60,22 @@ class AnswerRepository {
     return result;
   }
 
+  async findLikeByAnswerIdAndUserId(
+    answerId: number,
+    userId: number
+  ): Promise<schema.AnswerLike> {
+    const [result] = await db
+      .select()
+      .from(schema.answerLikes)
+      .where(
+        and(
+          eq(schema.answerLikes.answerId, answerId),
+          eq(schema.answerLikes.userId, userId)
+        )
+      );
+    return result;
+  }
+
   async createAnswer(
     code: string,
     questionId: number,
@@ -143,6 +159,14 @@ class AnswerRepository {
       .delete(schema.answerLikes)
       .where(eq(schema.answerLikes.answerId, answerId))
       .returning();
+    return result;
+  }
+
+  async countAnswerById(id: number): Promise<number> {
+    const [{ value: result }] = await db
+      .select({ value: count() })
+      .from(schema.answers)
+      .where(eq(schema.answers.id, id));
     return result;
   }
 

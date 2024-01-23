@@ -43,13 +43,28 @@ const router = express.Router();
  *            description: 자동 생성된 코멘트 고유값
  *          answerId:
  *            type: integer
- *            description: 답변 고유값
+ *            description: 답변의 고유값
  *          line:
  *            type: integer
  *            description: 수정한 코드의 라인
  *          description:
  *            type: string
  *            description: 수정한 내용 설명
+ *      AnswerLike:
+ *        type: object
+ *        properties:
+ *          id:
+ *            type: integer
+ *            description: 자동 생성된 추천 고유값
+ *          like:
+ *            type: integer
+ *            description: "추천 값 (좋아요: 1, 싫어요: -1, 취소: 0)"
+ *          answerId:
+ *            type: integer
+ *            description: 답변의 고유값
+ *          userId:
+ *            type: integer
+ *            description: 작성자 고유값
  */
 
 /**
@@ -81,7 +96,7 @@ const router = express.Router();
  *                           $ref: '#/components/schemas/User'
  *                         like:
  *                           type: integer
- *                           description: 답변의 좋아요/싫어요 총합
+ *                           description: 답변의 추천 총합
  *                         comments:
  *                           type: array
  *                           items:
@@ -231,8 +246,31 @@ router.delete('/:id(\\d+)/', isAuthenticated, answerController.deleteAnswer);
  *  @swagger
  *  paths:
  *   /answer/like/{id}:
+ *     get:
+ *       summary: 답변에 자기가 한 추천 보기
+ *       tags: [Answer]
+ *       parameters:
+ *         - in: path
+ *           name: id
+ *           schema:
+ *             type: integer
+ *           description: 답변의 고유값
+ *       responses:
+ *         "200":
+ *           description: 답변에 자기가 한 추천
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 $ref: '#/components/schemas/AnswerLike'
+ */
+router.get('/like/:id(\\d+)/', isAuthenticated, answerController.getLike);
+
+/**
+ *  @swagger
+ *  paths:
+ *   /answer/like/{id}:
  *     post:
- *       summary: 답변에 좋아요 / 싫어요 추가
+ *       summary: 답변에 추천 추가
  *       tags: [Answer]
  *       parameters:
  *         - in: path
@@ -249,10 +287,10 @@ router.delete('/:id(\\d+)/', isAuthenticated, answerController.deleteAnswer);
  *               properties:
  *                 like:
  *                   type: integer
- *                   description: "좋아요/싫어요 값 (좋아요: 1, 싫어요: -1, 취소: 0)"
+ *                   description: "추천 값 (좋아요: 1, 싫어요: -1, 취소: 0)"
  *       responses:
  *         "201":
- *           description: 반영된 답변
+ *           description: 추천이 반영된 답변
  *           content:
  *             application/json:
  *               schema:
@@ -264,7 +302,7 @@ router.delete('/:id(\\d+)/', isAuthenticated, answerController.deleteAnswer);
  *                         $ref: '#/components/schemas/User'
  *                       like:
  *                         type: integer
- *                         description: 답변의 좋아요/싫어요 총합
+ *                         description: 답변의 추천 총합
  *                       comments:
  *                         type: array
  *                         items:
