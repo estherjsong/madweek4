@@ -1,6 +1,6 @@
 import { Row, Col, Table, Card, CardTitle, CardBody, Pagination, PaginationItem, PaginationLink, Button, Input, InputGroup, ButtonDropdown, Dropdown, DropdownToggle, DropdownItem, DropdownMenu } from "reactstrap";
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { formatDateString } from "../dateUtils";
 
@@ -15,6 +15,7 @@ const Questions = () => {
         }
     }));
 
+    const navigate = useNavigate();
     const [postsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     const [posts, setPosts] = useState([]);
@@ -60,9 +61,22 @@ const Questions = () => {
     };
 
     useEffect(() => {
+        const hashParams = new URLSearchParams(window.location.hash.split('?')[1]);
+        console.log(hashParams);
+        const tagParam = hashParams.get('tag');
+        console.log(tagParam);
+        if (tagParam) {
+            setSearchOpen(true);
+            setSearchSelect('Tag');
+            setSearchTerm(tagParam);
+        }
         // Define your function to fetch data
         // Call the fetchData function when the component mounts or currentPage changes
-        fetchData({});
+        fetchData({
+            title: undefined,
+            nickname: undefined,
+            tag: tagParam ? tagParam : undefined,
+        });
     }, [currentPage, indexOfFirst, postsPerPage]);
 
     // Handle page change
@@ -122,7 +136,7 @@ const Questions = () => {
                                         <Button onClick={() => handleSearch()}>
                                             <i className="bi bi-search"></i>
                                         </Button>
-                                        <Button onClick={() => { setSearchOpen(false); fetchData({}) }} className="me-3 border-0 bg-transparent" size="sm">
+                                        <Button onClick={() => { setSearchOpen(false); setSearchTerm(''); setSearchSelect('All'); fetchData({}); navigate('/questions') }} className="me-3 border-0 bg-transparent" size="sm">
                                             <i className="bi bi-x text-dark"> </i>
                                         </Button>
                                     </InputGroup>
@@ -187,6 +201,9 @@ const Questions = () => {
                                 ))}
                             </tbody>
                         </Table>
+
+
+
                         <div>
                             {/* Pagination */}
                             <Pagination>

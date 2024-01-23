@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Card, Row, Col, CardTitle, CardBody, Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Card, Row, Col, CardTitle, CardBody, Button, Form, FormGroup, Label, Input, FormText, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import CodeMirror from '@uiw/react-codemirror';
 import { darcula } from '@uiw/codemirror-themes-all';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
@@ -10,10 +11,11 @@ import 'react-tagsinput/react-tagsinput.css'; // Import the styles for react-tag
 import TagsInput from 'react-tagsinput'; // Import the react-tagsinput component
 import { API_BASE_URL } from '../config';
 import language from './languages.json';
-import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-const Ask = () => {
+const Edit = () => {
     const navigate = useNavigate();
+    const { questionId } = useParams();
 
     const [langSelect, setLangSelect] = useState('javascript')
     const [formData, setFormData] = useState({
@@ -22,6 +24,8 @@ const Ask = () => {
         tags: [{ name: 'javascript', type: 1 }],
     });
     const [errors, setErrors] = useState({});
+    const [modal, setModal] = useState(false);
+    const toggle = () => setModal(!modal);
 
     const handleLanguageChange = (e) => {
         setLangSelect(e.target.value)
@@ -39,10 +43,25 @@ const Ask = () => {
             ...formData,
             code: editor,
         });
-        // console.log(editor, data, value)
-        // console.log(formData.code)
-        // console.log(formData)
     };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(`/question/${questionId}`);
+                console.log(response.data);
+                setFormData({
+                    title: response.data.title,
+                    code: response.data.code,
+                    tags: response.data.tags,
+                })
+                setLangSelect(response.data.tags[0].name)
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+    }, [])
 
     // const handleTagsChange = (tags) => {
     //     setFormData({
@@ -65,8 +84,9 @@ const Ask = () => {
         console.log('Form Data:', formData);
 
         try {
-            const response = await fetch(`${API_BASE_URL}/question`, {
-                method: 'POST',
+            // const response = await axios.put(`/question/${questionId}`, formData, { withCredentials: true });
+            const response = await fetch(`${API_BASE_URL}/question/${questionId}`, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -74,14 +94,13 @@ const Ask = () => {
                 body: JSON.stringify(formData),
             })
             const result = await response.json();
-
             console.log("response", response)
 
             if (response.ok) {
-                navigate('/questions')
-                console.log('Qeustion post successful', result);
+                navigate(`/detail/${questionId}`)
+                // console.log('Qeustion post successful', result);
             } else {
-                console.log('Qeustion post failed:', result);
+                // console.log('Qeustion post failed:', result);
                 const newErrors = {};
                 result.errors.forEach((error) => {
                     // error.msg에 따라 각각의 처리
@@ -97,7 +116,7 @@ const Ask = () => {
                             break;
                     }
                 });
-                
+
                 setErrors(newErrors);
             }
         } catch (error) {
@@ -110,9 +129,11 @@ const Ask = () => {
         <Row>
             <Col>
                 <Card>
-                    <CardTitle tag="h6" className="border-bottom p-3 mb-0">
-                        <i className="bi bi-bell me-2"> </i>
-                        Ask Form
+                    <CardTitle tag="h6" className="border-bottom p-3 mb-0 d-flex justify-content-between flex-column flex-sm-row">
+                        <div>
+                            <i className="bi bi-chevron-left me-2" onClick={toggle}></i>
+                            # {questionId} Question Edit Form
+                        </div>
                     </CardTitle>
                     <CardBody>
                         <Form onSubmit={handleSubmit}>
@@ -168,13 +189,27 @@ const Ask = () => {
                                     inputProps={{ placeholder: 'Add a tag' }}
                                 />
                             </FormGroup> */}
-                            <Button type="submit">Submit</Button>
+                            <Button type="submit">Save</Button>
                         </Form>
                     </CardBody>
                 </Card>
+                <Modal isOpen={modal} toggle={toggle}>
+                    <ModalHeader toggle={toggle}>Discard Changes and Exit</ModalHeader>
+                    <ModalBody>
+                        When you go back, the changes you made will not be saved. Do you want to continue?
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button color="secondary" onClick={toggle}>
+                            Cancel
+                        </Button>{' '}
+                        <Button color="primary" onClick={() => { navigate(-1); }}>
+                            Exit
+                        </Button>
+                    </ModalFooter>
+                </Modal>
             </Col>
         </Row>
     );
 };
 
-export default Ask;
+export default Edit;
