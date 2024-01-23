@@ -1,6 +1,6 @@
 import { and, count, eq, getTableColumns, inArray, sql } from 'drizzle-orm';
 
-import db from '@src/db';
+import db from '@config/db';
 import * as schema from '@src/schema';
 
 class AnswerRepository {
@@ -50,6 +50,14 @@ class AnswerRepository {
     return result;
   }
 
+  async findAnswersByUserId(userId: number): Promise<schema.Answer[]> {
+    const result = await db
+      .select()
+      .from(schema.answers)
+      .where(eq(schema.answers.userId, userId));
+    return result;
+  }
+
   async findCommentsByAnswerId(
     answerId: number
   ): Promise<schema.AnswerComment[]> {
@@ -57,6 +65,22 @@ class AnswerRepository {
       .select()
       .from(schema.answerComments)
       .where(eq(schema.answerComments.answerId, answerId));
+    return result;
+  }
+
+  async findLikeByAnswerIdAndUserId(
+    answerId: number,
+    userId: number
+  ): Promise<schema.AnswerLike> {
+    const [result] = await db
+      .select()
+      .from(schema.answerLikes)
+      .where(
+        and(
+          eq(schema.answerLikes.answerId, answerId),
+          eq(schema.answerLikes.userId, userId)
+        )
+      );
     return result;
   }
 
@@ -143,6 +167,14 @@ class AnswerRepository {
       .delete(schema.answerLikes)
       .where(eq(schema.answerLikes.answerId, answerId))
       .returning();
+    return result;
+  }
+
+  async countAnswerById(id: number): Promise<number> {
+    const [{ value: result }] = await db
+      .select({ value: count() })
+      .from(schema.answers)
+      .where(eq(schema.answers.id, id));
     return result;
   }
 

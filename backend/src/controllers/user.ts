@@ -4,6 +4,8 @@ import { matchedData, param, validationResult } from 'express-validator';
 import passport from 'passport';
 import { type IVerifyOptions } from 'passport-local';
 
+import answerRepository from '@repositories/answer';
+import questionRepository from '@repositories/question';
 import userRepository from '@repositories/user';
 import userService from '@services/user';
 import { type User } from '@src/schema';
@@ -29,13 +31,25 @@ class UserController {
     const data: Record<string, number> = matchedData(req);
 
     try {
-      const [user, score, topLanguages] = await Promise.all([
-        userRepository.findUserById(data.id),
-        userRepository.findUserScoreById(data.id),
-        userRepository.findUserTopLanguagesById(data.id, 3),
-      ]);
+      const [user, score, topLanguages, questions, answers] = await Promise.all(
+        [
+          userRepository.findUserById(data.id),
+          userRepository.findUserScoreById(data.id),
+          userRepository.findUserTopLanguagesById(data.id, 3),
+          questionRepository.findQuestionsByUserId(data.id),
+          answerRepository.findAnswersByUserId(data.id),
+        ]
+      );
       const { password, ...userWithoutPassword } = user;
-      res.status(200).json({ ...userWithoutPassword, score, topLanguages });
+      res
+        .status(200)
+        .json({
+          ...userWithoutPassword,
+          score,
+          topLanguages,
+          questions,
+          answers,
+        });
     } catch (error) {
       next(error);
     }

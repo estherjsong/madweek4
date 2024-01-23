@@ -19,12 +19,12 @@ const prod = ENVIRONMENT === 'production';
 
 if (prod && process.env.POSTGRES_URL == null) {
   logger.error(
-    'No mongo connection string. Set MONGODB_URI environment variable.'
+    'No postgres connection string. Set POSTGRES_URL environment variable.'
   );
   process.exit(1);
 } else if (!prod && process.env.POSTGRES_URL_LOCAL == null) {
   logger.error(
-    'No mongo connection string. Set MONGODB_URI_LOCAL environment variable.'
+    'No postgres connection string. Set POSTGRES_URL_LOCAL environment variable.'
   );
   process.exit(1);
 }
@@ -33,3 +33,4 @@ export const SESSION_SECRET = process.env.SESSION_SECRET!;
 export const POSTGRES_URL = prod
   ? process.env.POSTGRES_URL!
   : process.env.POSTGRES_URL_LOCAL!;
+export const OPENAI_API_KEY = process.env.OPENAI_API_KEY;

@@ -151,6 +151,9 @@ router.get('/:id(\\d+)/', questionController.getQuestion);
  *                   items:
  *                     $ref: '#/components/schemas/Tag'
  *                   description: 생성할 질문의 태그
+ *                 isRequestAI:
+ *                   type: boolean
+ *                   description: 인공지능 답변 요청 여부
  *       responses:
  *         "201":
  *           description: 새로 생성된 질문

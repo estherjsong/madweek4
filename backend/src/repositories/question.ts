@@ -9,7 +9,7 @@ import {
   inArray,
 } from 'drizzle-orm';
 
-import db from '@src/db';
+import db from '@config/db';
 import * as schema from '@src/schema';
 
 class QuestionRepository {
@@ -22,6 +22,14 @@ class QuestionRepository {
       .from(schema.questions)
       .where(eq(schema.questions.id, id))
       .innerJoin(schema.users, eq(schema.questions.userId, schema.users.id));
+    return result;
+  }
+
+  async findQuestionsByUserId(userId: number): Promise<schema.Question[]> {
+    const result = await db
+      .select()
+      .from(schema.questions)
+      .where(eq(schema.questions.userId, userId));
     return result;
   }
 

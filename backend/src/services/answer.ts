@@ -22,6 +22,18 @@ class AnswerService {
       .run(req);
   }
 
+  async validateAnswer(req: Request): Promise<void> {
+    await param('id', '올바르지 않은 답변입니다.')
+      .isInt()
+      .toInt()
+      .custom(async (value: number) => {
+        if ((await answerRepository.countAnswerById(value)) === 0) {
+          throw new Error();
+        }
+      })
+      .run(req);
+  }
+
   async validateWriter(req: Request): Promise<void> {
     await param('id', '올바르지 않은 답변입니다.')
       .isInt()

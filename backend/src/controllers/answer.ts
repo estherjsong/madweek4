@@ -159,9 +159,32 @@ class AnswerController {
     }
   };
 
+  getLike: RequestHandler = async (req, res, next) => {
+    await answerService.validateAnswer(req);
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors.array() });
+      return;
+    }
+
+    const data: Record<string, number> = matchedData(req);
+    const user = req.user as User;
+
+    try {
+      const like = (await answerRepository.findLikeByAnswerIdAndUserId(
+        data.id,
+        user.id
+      )) ?? { id: 0, like: 0, answerId: data.id, userId: user.id };
+      return res.status(200).json(like);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   postLike: RequestHandler = async (req, res, next) => {
     await answerService.validateNotWriter(req);
-    await body('like', '올바르지 않은 좋아요입니다.')
+    await body('like', '올바르지 않은 추천입니다.')
       .optional()
       .default(1)
       .isInt()
@@ -185,7 +208,8 @@ class AnswerController {
         user.id
       );
       const answer = await answerRepository.findAnswerById(like.answerId);
-      res.status(201).json(answer);
+      const comments = await answerRepository.findCommentsByAnswerId(answer.id);
+      res.status(201).json({ ...answer, comments });
     } catch (error) {
       next(error);
     }
