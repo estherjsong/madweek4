@@ -7,6 +7,7 @@ import { parse } from 'partial-json';
 
 import { createLLMAnswer } from '@config/langchain';
 import answerRepository from '@repositories/answer';
+import notificationRepository from '@repositories/notification';
 import questionRepository from '@repositories/question';
 import { type Question, type Tag, type User } from '@src/schema';
 import logger from '@utils/logger';
@@ -126,6 +127,12 @@ class QuestionService {
         (comment, index) =>
           aiAnswer.comments.findIndex((e) => e.line === comment.line) === index
       )
+    );
+
+    void notificationRepository.createNotification(
+      '올리신 질문에 AI 답변이 달렸습니다!',
+      '',
+      question.userId
     );
   }
 }

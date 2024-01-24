@@ -9,10 +9,12 @@ const migrationClient = postgres(POSTGRES_URL, {
   max: 1,
   onnotice: () => {},
 });
+
 void migrate(drizzle(migrationClient), { migrationsFolder: './drizzle' }).then(
   (_) => logger.debug('Database migration completed')
 );
 
 const queryClient = postgres(POSTGRES_URL);
 logger.debug(`PostgreSQL opened on '${POSTGRES_URL}' connection string`);
+
 export default drizzle(queryClient);

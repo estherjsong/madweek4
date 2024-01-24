@@ -2,6 +2,7 @@ import { type RequestHandler } from 'express';
 import { body, matchedData, param, validationResult } from 'express-validator';
 
 import answerRepository from '@repositories/answer';
+import notificationRepository from '@repositories/notification';
 import questionRepository from '@repositories/question';
 import answerService from '@services/answer';
 import questionService from '@services/question';
@@ -84,6 +85,16 @@ class AnswerController {
             commentData.findIndex((e) => e.line === comment.line) === index
         )
       );
+
+      void questionRepository
+        .findQuestionById(answer.questionId)
+        .then((question) => {
+          void notificationRepository.createNotification(
+            '올리신 질문에 답변이 달렸습니다!',
+            '',
+            question.userId
+          );
+        });
 
       res.status(201).json({ ...answer, comments });
     } catch (error) {
@@ -202,6 +213,11 @@ class AnswerController {
     const user = req.user as User;
 
     try {
+      const prev = await answerRepository.findLikeByAnswerIdAndUserId(
+        data.id as number,
+        user.id
+      );
+
       const like = await answerRepository.createLike(
         data.like as number,
         data.id as number,
@@ -209,6 +225,15 @@ class AnswerController {
       );
       const answer = await answerRepository.findAnswerById(like.answerId);
       const comments = await answerRepository.findCommentsByAnswerId(answer.id);
+
+      if (like.like === 1 && (prev == null || prev.like !== 1)) {
+        void notificationRepository.createNotification(
+          '올리신 답변에 좋아요가 달렸습니다!',
+          '',
+          answer.userId
+        );
+      }
+
       res.status(201).json({ ...answer, comments });
     } catch (error) {
       next(error);

@@ -10,6 +10,7 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUI from 'swagger-ui-express';
 
 import answerRouter from '@routes/answer';
+import notificationRouter from '@routes/notification';
 import questionRouter from '@routes/question';
 import tagRouter from '@routes/tag';
 import userRouter from '@routes/user';
@@ -78,5 +79,6 @@ app.use('/', userRouter);
 app.use('/question', questionRouter);
 app.use('/tag', tagRouter);
 app.use('/answer', answerRouter);
+app.use('/notification', notificationRouter);
 
 export default app;

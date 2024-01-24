@@ -28,6 +28,14 @@ class UserRepository {
     return result;
   }
 
+  async findUserByNickname(nickname: string): Promise<schema.User> {
+    const [result] = await db
+      .select()
+      .from(schema.users)
+      .where(eq(schema.users.nickname, nickname));
+    return result;
+  }
+
   async findUserScoreById(id: number): Promise<number> {
     const [{ value: result }] = await db
       .select({
@@ -128,6 +136,20 @@ class UserRepository {
     return result;
   }
 
+  async updateUserById(
+    id: number,
+    password: string,
+    nickname: string,
+    introduction: string
+  ): Promise<schema.User> {
+    const [result] = await db
+      .update(schema.users)
+      .set({ password, nickname, introduction })
+      .where(eq(schema.users.id, id))
+      .returning();
+    return result;
+  }
+
   async countUserById(id: number): Promise<number> {
     const [{ value: result }] = await db
       .select({ value: count() })
@@ -141,14 +163,6 @@ class UserRepository {
       .select({ value: count() })
       .from(schema.users)
       .where(eq(schema.users.userId, userId));
-    return result;
-  }
-
-  async countUserByNickname(nickname: string): Promise<number> {
-    const [{ value: result }] = await db
-      .select({ value: count() })
-      .from(schema.users)
-      .where(eq(schema.users.nickname, nickname));
     return result;
   }
 }

@@ -87,7 +87,12 @@ const router = express.Router();
  *                       answers:
  *                         type: array
  *                         items:
- *                           $ref: '#/components/schemas/Answer'
+ *                           allOf:
+ *                             - $ref: '#/components/schemas/Answer'
+ *                             - type: object
+ *                               properties:
+ *                                 question:
+ *                                   $ref: '#/components/schemas/Question'
  */
 router.get('/user/:id(\\d+)/', userController.getUser);
 
@@ -186,6 +191,42 @@ router.post('/logout', isAuthenticated, userController.postLogout);
  *                 $ref: '#/components/schemas/User'
  */
 router.post('/signup', userController.postSignup);
+
+/**
+ *  @swagger
+ *  paths:
+ *   /user:
+ *     put:
+ *       summary: 회원 정보 수정
+ *       tags: [User]
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 password:
+ *                   type: string
+ *                   description: 수정할 유저 비밀번호
+ *                 confirmPassword:
+ *                   type: string
+ *                   description: 비밀번호 확인
+ *                 nickname:
+ *                   type: string
+ *                   description: 수정할 유저 닉네임
+ *                 introduction:
+ *                   type: string
+ *                   description: 수정할 유저 자기소개
+ *       responses:
+ *         "200":
+ *           description: 수정한 유저 정보
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 $ref: '#/components/schemas/User'
+ */
+router.put('/user', isAuthenticated, userController.putUser);
 
 /**
  *  @swagger

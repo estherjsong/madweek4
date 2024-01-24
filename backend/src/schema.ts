@@ -110,3 +110,16 @@ export const answerLikes = pgTable(
 
 export type AnswerLike = typeof answerLikes.$inferSelect;
 export type NewAnswerLike = typeof answerLikes.$inferInsert;
+
+export const notifications = pgTable('notifications', {
+  id: serial('id').primaryKey(),
+  content: text('content').notNull(),
+  redirect: text('redirect').notNull(),
+  userId: integer('user_id').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export type Notification = typeof notifications.$inferSelect;
+export type NewNotification = typeof notifications.$inferInsert;

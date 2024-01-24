@@ -14,23 +14,28 @@ if (fs.existsSync('.env')) {
   dotenv.config({ path: '.env.example' });
 }
 
-export const ENVIRONMENT = process.env.NODE_ENV;
-const prod = ENVIRONMENT === 'production';
-
-if (prod && process.env.POSTGRES_URL == null) {
+if (process.env.POSTGRES_URL === undefined) {
   logger.error(
     'No postgres connection string. Set POSTGRES_URL environment variable.'
   );
   process.exit(1);
-} else if (!prod && process.env.POSTGRES_URL_LOCAL == null) {
+}
+
+if (process.env.SESSION_SECRET === undefined) {
   logger.error(
-    'No postgres connection string. Set POSTGRES_URL_LOCAL environment variable.'
+    'No session secret string. Set SESSION_SECRET environment variable.'
   );
   process.exit(1);
 }
 
-export const SESSION_SECRET = process.env.SESSION_SECRET!;
-export const POSTGRES_URL = prod
-  ? process.env.POSTGRES_URL!
-  : process.env.POSTGRES_URL_LOCAL!;
+if (process.env.OPENAI_API_KEY === undefined) {
+  logger.error(
+    'No OpenAI API key string. Set OPENAI_API_KEY environment variable.'
+  );
+  process.exit(1);
+}
+
+export const ENVIRONMENT = process.env.NODE_ENV;
+export const POSTGRES_URL = process.env.POSTGRES_URL;
+export const SESSION_SECRET = process.env.SESSION_SECRET;
 export const OPENAI_API_KEY = process.env.OPENAI_API_KEY;

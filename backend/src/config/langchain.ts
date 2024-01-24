@@ -1,5 +1,5 @@
 import logger from '@utils/logger';
-import { OPENAI_API_KEY } from '@utils/secret';
+import { ENVIRONMENT, OPENAI_API_KEY } from '@utils/secret';
 
 export async function createLLMAnswer(
   language: string,
@@ -12,7 +12,7 @@ export async function createLLMAnswer(
 
   const chatModel = new ChatOpenAI({
     openAIApiKey: OPENAI_API_KEY,
-    // modelName: 'gpt-4-1106-preview',
+    modelName: ENVIRONMENT === 'production' ? 'gpt-4-1106-preview' : undefined,
     temperature: 0.1,
   });
   const prompt = ChatPromptTemplate.fromMessages([

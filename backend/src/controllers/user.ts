@@ -1,6 +1,6 @@
 import * as argon2 from 'argon2';
 import { type RequestHandler } from 'express';
-import { matchedData, param, validationResult } from 'express-validator';
+import { body, matchedData, param, validationResult } from 'express-validator';
 import passport from 'passport';
 import { type IVerifyOptions } from 'passport-local';
 
@@ -89,6 +89,17 @@ class UserController {
   };
 
   postSignup: RequestHandler = async (req, res, next) => {
+    await body('userId', '아이디는 6-12자 이내의 영문/숫자만 사용 가능합니다.')
+      .trim()
+      .isString()
+      .isLength({ min: 6, max: 12 })
+      .isAlphanumeric()
+      .custom(async (value: string) => {
+        if ((await userRepository.countUserByUserId(value)) > 0) {
+          throw new Error('이미 존재하는 아이디입니다.');
+        }
+      })
+      .run(req);
     await userService.validateUser(req);
 
     const errors = validationResult(req);
@@ -116,6 +127,33 @@ class UserController {
         const { password, ...userWithoutPassword } = user;
         res.status(201).json(userWithoutPassword);
       });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  putUser: RequestHandler = async (req, res, next) => {
+    await userService.validateUser(req);
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors.array() });
+      return;
+    }
+
+    const data: Record<string, string> = matchedData(req);
+
+    try {
+      const hash = await argon2.hash(data.password);
+      const user = await userRepository.updateUserById(
+        (req.user as User).id,
+        hash,
+        data.nickname,
+        data.introduction
+      );
+
+      const { password, ...userWithoutPassword } = user;
+      res.status(200).json(userWithoutPassword);
     } catch (error) {
       next(error);
     }

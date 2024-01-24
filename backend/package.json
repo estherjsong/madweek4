@@ -13,7 +13,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@langchain/community": "^0.0.19",
     "@langchain/openai": "^0.0.12",
     "argon2": "^0.31.2",
     "axios": "^1.6.5",
