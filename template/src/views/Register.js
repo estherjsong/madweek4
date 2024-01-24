@@ -114,7 +114,7 @@ const RegisterForm = ({ isVisible, onClose, onLog }) => {
                             case '닉네임은 3-16자만 사용 가능합니다.':
                                 newErrors.nickname = 'Nicknames can only contain 3-16 characters.';
                                 break;
-                            case '닉네임은 3-16자만 사용 가능합니다.':
+                            case '이미 존재하는 닉네임입니다.':
                                 newErrors.nickname = 'The nickname that already exists.';
                                 break;
                             default:
