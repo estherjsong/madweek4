@@ -85,6 +85,9 @@ const router = express.Router();
  *                           properties:
  *                             user:
  *                               $ref: '#/components/schemas/User'
+ *                             answerCount:
+ *                               type: integer
+ *                               description: 달린 답변 수
  *                             tags:
  *                               type: array
  *                               items:

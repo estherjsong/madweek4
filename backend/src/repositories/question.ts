@@ -39,7 +39,14 @@ class QuestionRepository {
     title?: string,
     nickname?: string,
     tag?: string
-  ): Promise<Array<schema.Question & { user: Omit<schema.User, 'password'> }>> {
+  ): Promise<
+    Array<
+      schema.Question & {
+        user: Omit<schema.User, 'password'>;
+        answerCount: number;
+      }
+    >
+  > {
     const conditions: SQLWrapper[] = [];
 
     if (title !== undefined) {
@@ -58,7 +65,7 @@ class QuestionRepository {
             .selectDistinct({ questionId: schema.questionTags.questionId })
             .from(schema.tags)
             .where(ilike(schema.tags.name, `%${tag}%`))
-            .leftJoin(
+            .innerJoin(
               schema.questionTags,
               eq(schema.tags.id, schema.questionTags.tagId)
             )
@@ -68,13 +75,22 @@ class QuestionRepository {
 
     const { password, ...user } = getTableColumns(schema.users);
     const result = await db
-      .select({ ...getTableColumns(schema.questions), user })
+      .select({
+        ...getTableColumns(schema.questions),
+        user,
+        answerCount: count(schema.answers),
+      })
       .from(schema.questions)
       .innerJoin(schema.users, eq(schema.questions.userId, schema.users.id))
       .where(and(...conditions))
       .orderBy(desc(schema.questions.createdAt))
       .limit(limit)
-      .offset(offset);
+      .offset(offset)
+      .leftJoin(
+        schema.answers,
+        eq(schema.questions.id, schema.answers.questionId)
+      )
+      .groupBy(schema.questions.id, schema.users.id);
     return result;
   }
 
@@ -134,7 +150,7 @@ class QuestionRepository {
             .selectDistinct({ questionId: schema.questionTags.questionId })
             .from(schema.tags)
             .where(ilike(schema.tags.name, `%${tag}%`))
-            .leftJoin(
+            .innerJoin(
               schema.questionTags,
               eq(schema.tags.id, schema.questionTags.tagId)
             )
