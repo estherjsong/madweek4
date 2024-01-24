@@ -8,8 +8,8 @@ const navigation = [
     icon: "bi bi-speedometer2",
   },
   {
-    title: "Alert",
-    href: "/alerts",
+    title: "Notifications",
+    href: "/notifications",
     icon: "bi bi-bell",
   },
   {

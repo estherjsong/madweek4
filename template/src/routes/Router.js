@@ -13,6 +13,7 @@ const Edit = lazy(() => import("../views/Edit.js"));
 const Questions = lazy(() => import("../views/Questions.js"));
 const Detail = lazy(() => import("../views/Detail.js"));
 const MyPage = lazy(() => import("../views/MyPage.js"));
+const Notifications = lazy(() => import("../views/Notifications.js"))
 const Alerts = lazy(() => import("../views/ui/Alerts"));
 const Badges = lazy(() => import("../views/ui/Badges"));
 const Buttons = lazy(() => import("../views/ui/Buttons"));
@@ -36,6 +37,7 @@ const ThemeRoutes = [
       { path: "/edit/:questionId", exact: true, element: <Edit /> },
       { path: "/questions", exact: true, element: <Questions /> },
       { path: "/detail/:questionId", exact: true, element: <Detail /> },
+      { path: "/notifications", exact: true, element: <Notifications /> },
       { path: "/mypage", exact: true, element: <MyPage /> },
       { path: "/alerts", exact: true, element: <Alerts /> },
       { path: "/badges", exact: true, element: <Badges /> },

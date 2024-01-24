@@ -20,6 +20,7 @@ import user1 from "../assets/images/users/user4.jpg";
 import RegisterForm from "../views/Register";
 import LoginForm from "../views/Login";
 import LogoutForm from "../views/Logout";
+import { API_BASE_URL } from "../config";
 
 // const Header = ({ isLoggedIn, onLogout }) => {
 const Header = () => {
@@ -47,6 +48,44 @@ const Header = () => {
   const [notiColor, setNotiColor] = React.useState('secondary');
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/notification`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        });
+        const result = await response.json();
+
+        console.log("response", response)
+
+        if (response.ok) {
+          console.log('Notifications get successful', result);
+          setHowManyNoti(result.length);
+        } else {
+          console.log('Notifications get failed:', result);
+        }
+      } catch (error) {
+        console.error('An error occurred during getting:', error);
+        // 여기에서 적절한 에러 처리를 수행할 수 있습니다.
+      }
+    };
+
+    // 초기 실행
+    fetchData();
+
+    // 일정한 간격(예: 5초)으로 주기적으로 실행
+    const intervalId = setInterval(() => {
+      fetchData();
+    }, 5000); // 5000 밀리초마다 실행
+
+    // 컴포넌트가 언마운트될 때 clearInterval을 사용하여 interval 정리
+    return () => clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
     setNotiColor(howManyNoti === 0 ? 'secondary' : 'primary');
   }, [howManyNoti]);
 
@@ -54,7 +93,7 @@ const Header = () => {
   const Handletoggle = () => {
     setIsOpen(!isOpen);
   };
-  
+
   const showMobilemenu = () => {
     document.getElementById("sidebarArea").classList.toggle("showSidebar");
   };
@@ -120,9 +159,11 @@ const Header = () => {
           </UncontrolledDropdown>
         </Nav>
 
-        <Button color={notiColor} outline>
-          Notifications <Badge color={notiColor}>{howManyNoti}</Badge>
-        </Button>
+        <Link to="/notifications" className="nav-link">
+          <Button color={notiColor} outline>
+            Notifications <Badge color={notiColor}>{howManyNoti}</Badge>
+          </Button>
+        </Link>
         <Dropdown isOpen={dropdownOpen} toggle={toggle}>
           <DropdownToggle color="transparent">
             <img
@@ -136,7 +177,7 @@ const Header = () => {
             {isLoggedIn && (
               <>
                 <DropdownItem header>Info</DropdownItem>
-                <Link to={'/mypage'} style={{textDecoration: 'none'}}>
+                <Link to={'/mypage'} style={{ textDecoration: 'none' }}>
                   <DropdownItem>My Account</DropdownItem>
                 </Link>
                 <DropdownItem>Edit Profile</DropdownItem>

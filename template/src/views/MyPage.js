@@ -73,7 +73,7 @@ const MyPage = () => {
     return (
         <div>
             <Row>
-                <Col lg="4" className="sticky-top" style={{ top: '0', maxHeight: '100vh' }}>
+                <Col lg="4" style={{ position: 'sticky', top: '0', maxHeight: '100vh', overflowY: 'auto' }}>
                     <Card body className="text-center">
                         <CardTitle tag="h4" className="mt-3">
                             Profile
@@ -116,7 +116,7 @@ const MyPage = () => {
                         </Row>
                     </Card>
                 </Col>
-                <Col lg="8">
+                <Col lg="8" style={{ overflowY: 'auto' }}>
                     <Row>
                         {topLanguages.map((lang, index) => (
                             <Col md="6" lg="4">
@@ -124,12 +124,9 @@ const MyPage = () => {
                                     <CardTitle tag="h5" className="mb-3">{lang.name}</CardTitle>
 
                                     <CardText className="mt-3">
-                                        {/* {index === 0 && <Gold style={{ width: '50%' }} />}
-                                        {index === 1 && <Silver style={{ width: '50%' }} />}
-                                        {index === 2 && <Bronze style={{ width: '50%' }} />} */}
-                                        {index === 0 && <img src={Gold} style={{ width: '50%' }}/>}
-                                        {index === 1 && <img src={Silver} style={{ width: '50%' }}/>}
-                                        {index === 2 && <img src={Bronze} style={{ width: '50%' }}/>}
+                                        {index === 0 && <img src={Gold} style={{ width: '50%' }} />}
+                                        {index === 1 && <img src={Silver} style={{ width: '50%' }} />}
+                                        {index === 2 && <img src={Bronze} style={{ width: '50%' }} />}
                                         {/* <img src={`/assets/images/Medal${index+1}.svg`} /> */}
                                         <Row className="p-2 mt-3">
                                             <Col>
