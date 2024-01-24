@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { formatDateString } from "../dateUtils";
+import TagShow from "../components/TagShow";
 
 const Questions = () => {
     // Dummy data for questions
@@ -77,7 +78,7 @@ const Questions = () => {
             nickname: undefined,
             tag: tagParam ? tagParam : undefined,
         });
-    }, [currentPage, indexOfFirst, postsPerPage]);
+    }, [currentPage, indexOfFirst, postsPerPage, window.location.hash]);
 
     // Handle page change
     const handlePageChange = (pageNumber) => {
@@ -166,8 +167,7 @@ const Questions = () => {
                                 <tr>
                                     <th className="col-md-1"> # </th>
                                     <th className="col-md-7"> Question </th>
-                                    <th className="col-md-2">  </th>
-                                    <th className="col-md-2"> Username </th>
+                                    <th className="col-md-4"> Answers </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -176,7 +176,7 @@ const Questions = () => {
                                     <tr key={data.id}>
                                         <th scope="row">{data.id}</th>
                                         <td style={{ maxHeight: '50px', overflow: 'hidden' }}>
-                                            <Link to={`/detail/${data.id}`} style={{
+                                            <Link to={`/detail/${data.id}`} className='mb-3' style={{
                                                 textDecoration: 'none',
                                                 color: 'inherit',
                                                 backgroundColor: 'transparent',
@@ -185,7 +185,21 @@ const Questions = () => {
                                             }}>
                                                 <span>{data.title}</span>
                                             </Link>
-                                            <span>
+                                            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                                                <div>
+                                                    <TagShow tagsList={data.tags} />
+                                                </div>
+                                                <div>
+                                                    <small>
+                                                        {data.user.nickname} asked {formatDateString(data.createdAt)}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {data.answerCount}
+                                        </td>
+                                        {/* <span>
                                                 {data.tags.map((tag) => (
                                                     <small key={tag.id}>{tag.name}, </small>
                                                 ))}
@@ -196,7 +210,7 @@ const Questions = () => {
                                                 {formatDateString(data.createdAt)}
                                             </small>
                                         </td>
-                                        <td>{data.user.nickname}</td>
+                                        <td>{data.user.nickname}</td> */}
                                     </tr>
                                 ))}
                             </tbody>

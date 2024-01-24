@@ -17,6 +17,7 @@ import axios from 'axios';
 import Loader from '../layouts/loader/Loader';
 import { formatDateString } from '../dateUtils';
 import './animation.css'
+import TagShow from '../components/TagShow';
 
 const Detail = () => {
     const id = localStorage.getItem('id');
@@ -26,6 +27,7 @@ const Detail = () => {
     const [post, setPost] = useState();
     const [loading, setLoading] = useState(true); // Track loading state
     const [modal, setModal] = useState(false);
+    const [ansModal, setAnsModal] = useState(false);
     const navigate = useNavigate();
     const codeMirrorRef = useRef(null);
     const [selectedLine, setSelectedLine] = useState(0);
@@ -147,11 +149,20 @@ const Detail = () => {
 
             if (response.ok) {
                 console.log('Answer post successful', result);
-                fetchAnswers();
                 setCode('');
                 setDescription('');
+                fetchAnswers();
             } else {
                 console.log('Answer post failed:', result);
+                result.errors.forEach((error) => {
+                    switch (error.msg) {
+                        case '사용자가 작성한 질문입니다.':
+                            alert('You cannot reply to your own question.');
+                            break;
+                        default:
+                            break;
+                    }
+                })
             }
         } catch (error) {
             console.error('An error occurred during posting:', error);
@@ -207,6 +218,7 @@ const Detail = () => {
         }
     }
     const toggle = () => setModal(!modal);
+    const ansToggle = () => setAnsModal(!ansModal);
 
     useEffect(() => {
         // Define your function to fetch data
@@ -250,7 +262,31 @@ const Detail = () => {
         }
     };
 
+    const deleteAnswer = async (answerId) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/answer/${answerId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            })
+            const result = await response.json();
+            console.log(response.data);
 
+            if (response.ok) {
+                console.log('Answer delete successful', result);
+                alert('Your answer is deleted successfully');
+                fetchAnswers();
+            } else {
+                console.log('Answer delete failed:', result);
+            }
+            // console.log(typeof id, typeof post.userId, parseInt(id)===post.userId)
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        } finally {
+        }
+    };
 
     const renderLikeButton = (answerId, likeType) => (
         <Button
@@ -341,11 +377,12 @@ const Detail = () => {
 
                                 <Row>
                                     <Col>
-                                        {post.tags.map((tag) => (
+                                        {/* {post.tags.map((tag) => (
                                             <Button className="btn me-2" outline color="primary" size="sm" onClick={() => { navigate(`/questions?tag=${tag.name}`) }}>
                                                 {tag.name}
                                             </Button>
-                                        ))}
+                                        ))} */}
+                                        <TagShow tagsList={post.tags} />
                                     </Col>
                                     <Col xs='auto' className='ms-auto'>
                                         <div className="d-flex flex-column">
@@ -421,11 +458,45 @@ const Detail = () => {
                                             </Col>
                                         </Row>
                                         <Col xs='auto' className='ms-auto'>
-                                            <div className="d-flex flex-column">
-                                                <small className="text-muted ms-auto">{formatDateString(answer.createdAt)}</small>
-                                                <small className="text-muted ms-auto">{answer.user.nickname}</small>
+                                            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                                                {(parseInt(id) === answer.userId) ? (
+                                                    <div>
+                                                        <Link to={`/edit/${post.id}`} className='me-3'>
+                                                            <Button className="btn" color="primary" size="sm">
+                                                                <i className="bi bi-pencil-square"> </i>
+                                                            </Button>
+                                                        </Link>
+                                                        <Button className="btn" size="sm" onClick={ansToggle} color="danger">
+                                                            <i className="bi bi-trash"> </i>
+                                                        </Button>
+                                                    </div>
+                                                ) : (
+                                                    <div>
+                                                    </div>
+                                                )
+                                                }
+                                                <div className="d-flex flex-column">
+                                                    <small className="text-muted ms-auto">{formatDateString(answer.createdAt)}</small>
+                                                    <small className="text-muted ms-auto">{answer.user.nickname}</small>
+                                                </div>
                                             </div>
+
                                         </Col>
+
+                                        <Modal isOpen={ansModal} toggle={ansToggle}>
+                                            <ModalHeader toggle={ansToggle}>Answer Deletion</ModalHeader>
+                                            <ModalBody>
+                                                Are you sure you want to delete this answer? This action cannot be undone.
+                                            </ModalBody>
+                                            <ModalFooter>
+                                                <Button color="secondary" onClick={ansToggle}>
+                                                    Cancel
+                                                </Button>{' '}
+                                                <Button color="primary" onClick={() => deleteAnswer(answer.id)}>
+                                                    Delete
+                                                </Button>
+                                            </ModalFooter>
+                                        </Modal>
                                     </CardBody>
                                 </Card>
                             ))}
@@ -545,6 +616,8 @@ const Detail = () => {
                                 </Button>
                             </ModalFooter>
                         </Modal>
+
+
                     </Col>
                 </Row >
             )}

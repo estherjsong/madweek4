@@ -95,7 +95,7 @@ const LoginForm = ({ isVisible, onClose, onReg }) => {
                     // 여기에서 적절한 에러 처리를 수행할 수 있습니다.
 
                     const newErrors = {};
-                    switch (result.error) {
+                    switch (result.message) {
                         case '존재하지 않는 아이디입니다.':
                             newErrors.userId = 'This ID does not exist.';
                             break;
