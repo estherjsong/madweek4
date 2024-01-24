@@ -29,7 +29,8 @@ class QuestionRepository {
     const result = await db
       .select()
       .from(schema.questions)
-      .where(eq(schema.questions.userId, userId));
+      .where(eq(schema.questions.userId, userId))
+      .orderBy(desc(schema.questions.createdAt));
     return result;
   }
 
@@ -62,7 +63,7 @@ class QuestionRepository {
         inArray(
           schema.questions.id,
           db
-            .selectDistinct({ questionId: schema.questionTags.questionId })
+            .select({ questionId: schema.questionTags.questionId })
             .from(schema.tags)
             .where(ilike(schema.tags.name, `%${tag}%`))
             .innerJoin(
@@ -147,7 +148,7 @@ class QuestionRepository {
         inArray(
           schema.questions.id,
           db
-            .selectDistinct({ questionId: schema.questionTags.questionId })
+            .select({ questionId: schema.questionTags.questionId })
             .from(schema.tags)
             .where(ilike(schema.tags.name, `%${tag}%`))
             .innerJoin(

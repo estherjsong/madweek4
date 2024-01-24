@@ -1,4 +1,12 @@
-import { and, count, eq, getTableColumns, inArray, sql } from 'drizzle-orm';
+import {
+  and,
+  count,
+  desc,
+  eq,
+  getTableColumns,
+  inArray,
+  sql,
+} from 'drizzle-orm';
 
 import db from '@config/db';
 import * as schema from '@src/schema';
@@ -54,7 +62,8 @@ class AnswerRepository {
     const result = await db
       .select()
       .from(schema.answers)
-      .where(eq(schema.answers.userId, userId));
+      .where(eq(schema.answers.userId, userId))
+      .orderBy(desc(schema.answers.createdAt));
     return result;
   }
 
