@@ -59,13 +59,13 @@ const Header = () => {
         });
         const result = await response.json();
 
-        console.log("response", response)
+        // console.log("response", response)
 
         if (response.ok) {
-          console.log('Notifications get successful', result);
+          // console.log('Notifications get successful', result);
           setHowManyNoti(result.length);
         } else {
-          console.log('Notifications get failed:', result);
+          // console.log('Notifications get failed:', result);
         }
       } catch (error) {
         console.error('An error occurred during getting:', error);

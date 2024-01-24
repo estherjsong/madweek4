@@ -161,7 +161,7 @@ const Questions = () => {
                     </CardTitle>
 
 
-                    <CardBody className="">
+                    <CardBody>
                         <Table hover>
                             <thead>
                                 <tr>

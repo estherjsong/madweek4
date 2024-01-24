@@ -20,6 +20,7 @@ const Ask = () => {
         title: '',
         code: '',
         tags: [{ name: 'javascript', type: 1 }],
+        isRequestAI: false,
     });
     const [errors, setErrors] = useState({});
 
@@ -52,6 +53,12 @@ const Ask = () => {
     //     console.log(tags)
     //     console.log(formData)
     // };
+    const handleCheckboxChange = (e) => {
+        setFormData({
+            ...formData,
+            isRequestAI: e.target.checked,
+        });
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -97,7 +104,7 @@ const Ask = () => {
                             break;
                     }
                 });
-                
+
                 setErrors(newErrors);
             }
         } catch (error) {
@@ -156,6 +163,15 @@ const Ask = () => {
                                 />
                                 {errors.code && <div className="text-danger">{errors.code}</div>}
                             </FormGroup>
+                            <FormGroup check>
+                                <Label check>Would you like to use AI-generated responses?</Label>
+                                <Input
+                                    id="isRequestAI"
+                                    name="isRequestAI"
+                                    type="checkbox"
+                                    checked={formData.isRequestAI}
+                                    onChange={handleCheckboxChange} />
+                            </FormGroup>
                             {/* <FormGroup>
                                 <Label for="tags">Tags</Label>
                                 <Tags value={formData.tags} onChange={handleTagsChange} />
@@ -168,7 +184,7 @@ const Ask = () => {
                                     inputProps={{ placeholder: 'Add a tag' }}
                                 />
                             </FormGroup> */}
-                            <Button type="submit">Submit</Button>
+                            <Button type="submit" className='mt-3'>Submit</Button>
                         </Form>
                     </CardBody>
                 </Card>

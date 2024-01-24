@@ -210,10 +210,6 @@ const RegisterForm = ({ isVisible, onClose, onLog }) => {
                                 onChange={handleChange}
                             />
                         </FormGroup>
-
-                        <FormGroup check>
-                            <Input type="checkbox" /> <Label check>Check me out</Label>
-                        </FormGroup>
                         <Button onClick={handleSubmit} className="btn" color="secondary" style={{ width: '100%', marginTop: '10px', marginBottom: '10px' }}>Submit</Button>
                     </Form>
                 </CardBody>
