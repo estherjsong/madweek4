@@ -29,6 +29,7 @@ const EditableAnswer = (post) => {
     const [description, setDescription] = useState('');
     const [comments, setComments] = useState([]);
     const [lineCount, setLineCount] = useState(0);
+    const [lineCounts, setLineCounts] = useState([]);
     const [code, setCode] = useState('');
 
     const handleChange = (editor, data, value) => {

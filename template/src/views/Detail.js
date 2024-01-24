@@ -30,18 +30,23 @@ const Detail = () => {
     const [ansModal, setAnsModal] = useState(false);
     const navigate = useNavigate();
     const codeMirrorRef = useRef(null);
+    const codeMirrorRef2 = useRef(null);
     const [selectedLine, setSelectedLine] = useState(0);
-    const [codeMirrorTop, setCodeMirrorTop] = useState(0);
     const answerCardsContainerRef = useRef(null);
     const [comments, setComments] = useState([]);
+    const [editComments, setEditComments] = useState([]);
     const [description, setDescription] = useState('');
     const [code, setCode] = useState('');
+    const [editCode, setEditCode] = useState('');
     const [answersList, setAnswersList] = useState([]);
 
     const [likes, setLikes] = useState({});
     const [lookingLines, setLookingLines] = useState([]);
     const [lineCounts, setLineCounts] = useState([]);
+    const [editableStates, setEditableStates] = useState(Array(answersList.length).fill(false));
     const [lineCount, setLineCount] = useState(0);
+    const [editLineCount, setEditLineCount] = useState(0);
+    const [editSelectedLine, setEditSelectedLine] = useState(0);
 
     const handleButtonClick = (lineNumber) => {
         console.log(`Button clicked for Line ${lineNumber}`);
@@ -60,8 +65,29 @@ const Detail = () => {
         }
     };
 
+    const handleEditButtonClick = (lineNumber) => {
+        console.log(`Button clicked for Line ${lineNumber}`);
+
+        setEditSelectedLine(lineNumber);
+        setDescription(editComments.find(comment => comment.line === lineNumber)?.description);
+        if (codeMirrorRef2.current) {
+            const view = codeMirrorRef2.current.view;
+            const tr = view.state.update({
+                selection: {
+                    anchor: view.state.doc.line(lineNumber).from,
+                    head: view.state.doc.line(lineNumber).to,
+                },
+            });
+            view.dispatch(tr);
+        }
+    };
+
     const handleChange = (editor, data, value) => {
         setCode(editor)
+    };
+
+    const handleEditChange = (editor, data, value) => {
+        setEditCode(editor)
     };
 
     const handleLike = async (answerId, like) => {
@@ -102,6 +128,7 @@ const Detail = () => {
             // 여기에서 적절한 에러 처리를 수행할 수 있습니다.
         }
     }
+
     async function getLike(answerId) {
         try {
             const response = await fetch(`${API_BASE_URL}/answer/like/${answerId}`, {
@@ -151,6 +178,7 @@ const Detail = () => {
                 console.log('Answer post successful', result);
                 setCode('');
                 setDescription('');
+                setComments([]);
                 fetchAnswers();
             } else {
                 console.log('Answer post failed:', result);
@@ -163,6 +191,38 @@ const Detail = () => {
                             break;
                     }
                 })
+            }
+        } catch (error) {
+            console.error('An error occurred during posting:', error);
+            // 여기에서 적절한 에러 처리를 수행할 수 있습니다.
+        }
+    }
+
+    const handleAnswerEdit = async (answerId) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/answer/${answerId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    code: editCode,
+                    comments: editComments,
+                }),
+            })
+            const result = await response.json();
+
+            console.log("response", response)
+
+            if (response.ok) {
+                console.log('Answer edit successful', result);
+                setEditComments([]);
+                setEditCode('');
+                setDescription('');
+                fetchAnswers();
+            } else {
+                console.log('Answer edit failed:', result);
             }
         } catch (error) {
             console.error('An error occurred during posting:', error);
@@ -185,6 +245,16 @@ const Detail = () => {
             updatedLookingLines[answerIndex] = lineNumber;
             return updatedLookingLines;
         });
+    };
+
+    const toggleEditable = (index) => {
+        console.log(editableStates[index]);
+        setEditableStates((prevStates) => {
+            const updatedStates = [...prevStates];
+            updatedStates[index] = !updatedStates[index];
+            return updatedStates;
+        });
+        console.log(editableStates[index]);
     };
 
     // getLike 함수를 한 번만 호출하여 결과를 저장
@@ -369,7 +439,6 @@ const Detail = () => {
                                     className='mb-3'
                                     id="code"
                                     value={post.code}
-                                    // value={'#include <stdio.h>\n\nint main() {\n    for(int i=0; i<5; i++){\n        for(int j=0; j<5; j++){\n            printf(\'%d %d\', i, j);\n        }\n    }\n     return 0;\n}'}
                                     theme={darcula}
                                     minHeight={'100px'}
                                     extensions={[loadLanguage(post.tags[0].name), EditorView.editable.of(false), EditorState.readOnly.of(true)]}
@@ -411,61 +480,155 @@ const Detail = () => {
                                         </div>
                                     </CardTitle>
                                     <CardBody>
-                                        <Row>
-                                            <Col sm="7" lg="8" xl="8" xxl="8">
-                                                <CodeMirror
-                                                    className='mb-3'
-                                                    id="code"
-                                                    value={answer.code}
-                                                    theme={darcula}
-                                                    minHeight={'100px'}
-                                                    extensions={[
-                                                        loadLanguage(post.tags[0].name),
-                                                        EditorView.editable.of(false),
-                                                        EditorState.readOnly.of(true),
-                                                    ]}
-                                                />
-                                            </Col>
-                                            <Col sm="5" lg="4" xl="4" xxl="4" className="d-flex flex-column">
-                                                {Array.from({ length: lineCounts[index] || 0 }, (_, lineNumber) => (
-                                                    <div>
-                                                        <Button
-                                                            className={`btn-hover ${lookingLines[index] === lineNumber ? 'selected' : ''} ${!answer.comments.find(comment => comment.line === lineNumber + 1)?.description ? 'hidden' : ''}`}
-                                                            outline
-                                                            color='black'
-                                                            id={`LookingClick_${index}${lineNumber}`}
-                                                            key={lineNumber}
-                                                            onClick={() => setLookingLine(index, lineNumber)}
-                                                        >
-                                                            <i className="bi bi-chevron-right"> </i>
-                                                        </Button>
-                                                        {document.getElementById(`LookingClick_${index}${lineNumber}`) && (
+                                        {editableStates[index] ? (
+                                            <Row>
+                                                <Col sm="7" lg="8" xl="8" xxl="8">
+                                                    <CodeMirror
+                                                        className='mb-3'
+                                                        ref={codeMirrorRef2}
+                                                        theme={darcula}
+                                                        minHeight={'150px'}
+                                                        value={editCode}
+                                                        onChange={handleEditChange}
+                                                        extensions={[
+                                                            loadLanguage(post.tags[0].name),
+                                                            EditorView.updateListener.of((update) => {
+                                                                if (update.docChanged) {
+                                                                    setEditLineCount(update.state.doc.lines);
+                                                                }
+                                                            }),
+                                                        ]}
+                                                    />
+                                                </Col>
+                                                <Col sm="5" lg="4" xl="4" xxl="4" className="d-flex flex-column">
+                                                    {Array.from({ length: editLineCount }, (_, index) => index + 1).map((lineNumber) => (
+                                                        <div>
+                                                            <Button
+                                                                className={`btn-hover ${editSelectedLine === lineNumber ? 'selected' : ''}`}
+                                                                outline
+                                                                color='black'
+                                                                id={`PopoverEditClick_${lineNumber}`}
+                                                                key={lineNumber}
+                                                                onClick={() => handleEditButtonClick(lineNumber)}
+                                                            >
+                                                                <i className="bi bi-plus"> </i>
+                                                            </Button>
+                                                            <span>{Array.from(editComments).find(comment => comment.line === lineNumber)?.description}</span>
                                                             <UncontrolledPopover
                                                                 placement="right"
-                                                                target={`LookingClick_${index}${lineNumber}`}
+                                                                target={`PopoverEditClick_${lineNumber}`}
                                                                 trigger="legacy"
-                                                                isOpen={lookingLines[index] === parseInt(lineNumber)}
+                                                                isOpen={editSelectedLine === parseInt(lineNumber)}
                                                                 style={{ backgroundColor: 'white', borderRadius: '10px' }}
                                                             >
                                                                 <PopoverBody className="d-flex">
                                                                     {/* Assuming answersData is an array containing objects with properties line and content */}
-                                                                    {answer.comments.find(comment => comment.line === lineNumber + 1)?.description}
+                                                                    <Input
+                                                                        id="title"
+                                                                        name="title"
+                                                                        placeholder="with a placeholder"
+                                                                        type="textarea"
+                                                                        style={{ minHeight: '100px', marginRight: '10px' }}
+                                                                        value={description}
+                                                                        onChange={(e) => {
+                                                                            setDescription(e.target.value);
+                                                                        }}
+                                                                    />
+                                                                    <Button
+                                                                        style={{
+                                                                            backgroundColor: 'transparent',
+                                                                            color: 'black',
+                                                                            borderColor: 'transparent',
+                                                                            width: '30px', // 버튼의 너비 조정 (조절 가능)
+                                                                            padding: '0',
+                                                                        }}
+                                                                        onClick={() => {
+                                                                            setEditComments((prevComments) => {
+                                                                                const updatedComments = [...prevComments];
+                                                                                const existingCommentIndex = updatedComments.findIndex(comment => comment.line === lineNumber);
+
+                                                                                if (existingCommentIndex !== -1) {
+                                                                                    // If a comment for the lineNumber already exists, update its description
+                                                                                    updatedComments[existingCommentIndex].description = description;
+                                                                                } else {
+                                                                                    // If there's no comment for the lineNumber, create a new comment
+                                                                                    updatedComments.push({ line: lineNumber, description: description });
+                                                                                }
+
+                                                                                return updatedComments;
+                                                                            });
+                                                                        }}
+                                                                    >
+                                                                        <i className="bi bi-check-circle-fill"></i>
+                                                                    </Button>
                                                                 </PopoverBody>
                                                             </UncontrolledPopover>
-                                                        )}
-                                                    </div>
-                                                ))}
-                                            </Col>
-                                        </Row>
+                                                        </div>
+                                                    ))}
+                                                </Col>
+                                            </Row>
+                                        ) : (
+                                            <Row>
+                                                <Col sm="7" lg="8" xl="8" xxl="8">
+                                                    <CodeMirror
+                                                        className='mb-3'
+                                                        id="code"
+                                                        value={answer.code}
+                                                        theme={darcula}
+                                                        minHeight={'100px'}
+                                                        extensions={[
+                                                            loadLanguage(post.tags[0].name),
+                                                            EditorView.editable.of(false),
+                                                            EditorState.readOnly.of(true),
+                                                        ]}
+                                                    />
+                                                </Col>
+                                                <Col sm="5" lg="4" xl="4" xxl="4" className="d-flex flex-column">
+                                                    {Array.from({ length: lineCounts[index] || 0 }, (_, lineNumber) => (
+                                                        <div>
+                                                            <Button
+                                                                className={`btn-hover ${lookingLines[index] === lineNumber ? 'selected' : ''} ${!answer.comments.find(comment => comment.line === lineNumber + 1)?.description ? 'hidden' : ''}`}
+                                                                outline
+                                                                color='black'
+                                                                id={`LookingClick_${index}${lineNumber}`}
+                                                                key={lineNumber}
+                                                                onClick={() => setLookingLine(index, lineNumber)}
+                                                            >
+                                                                <i className="bi bi-chevron-right"> </i>
+                                                            </Button>
+                                                            {document.getElementById(`LookingClick_${index}${lineNumber}`) && (
+                                                                <UncontrolledPopover
+                                                                    placement="right"
+                                                                    target={`LookingClick_${index}${lineNumber}`}
+                                                                    trigger="legacy"
+                                                                    isOpen={lookingLines[index] === parseInt(lineNumber)}
+                                                                    style={{ backgroundColor: 'white', borderRadius: '10px' }}
+                                                                >
+                                                                    <PopoverBody className="d-flex">
+                                                                        {/* Assuming answersData is an array containing objects with properties line and content */}
+                                                                        {answer.comments.find(comment => comment.line === lineNumber + 1)?.description}
+                                                                    </PopoverBody>
+                                                                </UncontrolledPopover>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </Col>
+                                            </Row>
+                                        )}
+
                                         <Col xs='auto' className='ms-auto'>
                                             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                                                 {(parseInt(id) === answer.userId) ? (
                                                     <div>
-                                                        <Link to={`/edit/${post.id}`} className='me-3'>
-                                                            <Button className="btn" color="primary" size="sm">
+                                                        {editableStates[index] ? (
+                                                            <Button className="btn me-1" color="primary" size="sm" onClick={() => { handleAnswerEdit(answer.id); toggleEditable(index); }}>
+                                                                <i className="bi bi-check2"> </i>
+                                                            </Button>
+                                                        ) : (
+                                                            <Button className="btn me-1" color="primary" size="sm" onClick={() => { setEditCode(answer.code); setEditComments(answer.comments); setEditLineCount((answer.code.match(/\n/g) || []).length + 1); toggleEditable(index); }}>
                                                                 <i className="bi bi-pencil-square"> </i>
                                                             </Button>
-                                                        </Link>
+                                                        )}
                                                         <Button className="btn" size="sm" onClick={ansToggle} color="danger">
                                                             <i className="bi bi-trash"> </i>
                                                         </Button>

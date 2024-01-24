@@ -55,18 +55,19 @@ const Starter = () => {
       </Row>
       <Row>
         <Col sm="6" lg="6" xl="7" xxl="8" className="h-100">
-          <SolvedChart />
+
+          <ActiveQuestions />
         </Col>
         <Col sm="6" lg="6" xl="5" xxl="4" className="h-100">
           <ScoreTable />
         </Col>
       </Row>
       {/***Table ***/}
-      <Row>
+      {/* <Row>
         <Col lg="12">
           <ActiveQuestions />
         </Col>
-      </Row>
+      </Row> */}
     </div>
   );
 };
