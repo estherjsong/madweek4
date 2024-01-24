@@ -1,9 +1,9 @@
 import {
-  and,
   count,
   desc,
   eq,
   getTableColumns,
+  gt,
   inArray,
   sql,
 } from 'drizzle-orm';
@@ -49,32 +49,69 @@ class UserRepository {
   async findUserTopLanguagesById(
     id: number,
     limit: number
-  ): Promise<Array<schema.Tag & { count: number }>> {
+  ): Promise<
+    Array<
+      schema.Tag & { count: number; questionCount: number; answerCount: number }
+    >
+  > {
+    const questionCount = count(
+      sql`case when ${inArray(
+        schema.questionTags.questionId,
+        db
+          .select({ value: schema.questions.id })
+          .from(schema.questions)
+          .where(eq(schema.questions.userId, id))
+      )} then ${schema.tags.id} end`
+    );
+    const answerCount = count(
+      sql`case when ${inArray(
+        schema.questionTags.questionId,
+        db
+          .select({ value: schema.answers.questionId })
+          .from(schema.answers)
+          .where(eq(schema.answers.userId, id))
+      )} then ${schema.tags.id} end`
+    );
+    const allCount = sql<number>`cast(${questionCount} + ${answerCount} as int)`;
     const result = await db
       .select({
         ...getTableColumns(schema.tags),
-        count: count(schema.tags.id),
+        count: allCount,
+        questionCount,
+        answerCount,
       })
-      .from(schema.tags)
-      .innerJoin(
-        schema.questionTags,
-        eq(schema.tags.id, schema.questionTags.tagId)
-      )
-      .where(
-        and(
-          eq(schema.tags.type, 1),
-          inArray(
-            schema.questionTags.questionId,
-            db
-              .select({ value: schema.questions.id })
-              .from(schema.questions)
-              .where(eq(schema.questions.userId, id))
-          )
-        )
-      )
+      .from(schema.questionTags)
+      .innerJoin(schema.tags, eq(schema.questionTags.tagId, schema.tags.id))
+      .where(eq(schema.tags.type, 1))
       .groupBy(schema.tags.id)
-      .orderBy(desc(count(schema.tags.id)))
+      .having(gt(allCount, 0))
+      .orderBy(desc(allCount))
       .limit(limit);
+    return result;
+  }
+
+  async findRankUsers(
+    limit: number
+  ): Promise<
+    Array<Omit<schema.User, 'password'> & { score: number; rank: number }>
+  > {
+    const { password, ...user } = getTableColumns(schema.users);
+    const score = sql<number>`coalesce(cast(sum(${schema.answerLikes.like}) as int), 0)`;
+    const result = await db
+      .select({
+        ...user,
+        rank: sql<number>`cast(rank() over (order by ${score} desc) as int)`,
+        score,
+      })
+      .from(schema.users)
+      .leftJoin(schema.answers, eq(schema.users.id, schema.answers.userId))
+      .leftJoin(
+        schema.answerLikes,
+        eq(schema.answers.id, schema.answerLikes.answerId)
+      )
+      .groupBy(schema.users.id)
+      .limit(limit);
+
     return result;
   }
 

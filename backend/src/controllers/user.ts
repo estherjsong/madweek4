@@ -41,15 +41,13 @@ class UserController {
         ]
       );
       const { password, ...userWithoutPassword } = user;
-      res
-        .status(200)
-        .json({
-          ...userWithoutPassword,
-          score,
-          topLanguages,
-          questions,
-          answers,
-        });
+      res.status(200).json({
+        ...userWithoutPassword,
+        score,
+        topLanguages,
+        questions,
+        answers,
+      });
     } catch (error) {
       next(error);
     }
@@ -118,6 +116,15 @@ class UserController {
         const { password, ...userWithoutPassword } = user;
         res.status(201).json(userWithoutPassword);
       });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getRank: RequestHandler = async (req, res, next) => {
+    try {
+      const users = await userRepository.findRankUsers(5);
+      res.status(200).json(users);
     } catch (error) {
       next(error);
     }
