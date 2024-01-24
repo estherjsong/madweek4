@@ -1,4 +1,6 @@
 import { Card, CardBody, CardTitle, CardSubtitle, Table } from "reactstrap";
+import { useEffect, useState } from "react";
+import { API_BASE_URL } from "../../config";
 import user1 from "../../assets/images/users/user1.jpg";
 import user2 from "../../assets/images/users/user2.jpg";
 import user3 from "../../assets/images/users/user3.jpg";
@@ -54,6 +56,37 @@ const tableData = [
 ];
 
 const ScoreTables = () => {
+  const [rank, setRank] = useState([]);
+
+  const fetchRanking = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/rank`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      })
+      const result = await response.json();
+
+      console.log("response", response)
+
+      if (response.ok) {
+        console.log('rank get succes', result);
+        setRank(result)
+      } else {
+        console.log('rank get failed:', result);
+      }
+    } catch (error) {
+      console.error('An error occurred during posting:', error);
+      // 여기에서 적절한 에러 처리를 수행할 수 있습니다.
+    }
+  }
+
+  useEffect(() => {
+    fetchRanking();
+  }, [])
+
   return (
     <div>
       <Card>
@@ -72,7 +105,7 @@ const ScoreTables = () => {
               </tr>
             </thead>
             <tbody>
-              {tableData.map((tdata, index) => (
+              {rank.map((tdata, index) => (
                 <tr key={index} className="border-top">
                   <td>{index + 1}</td>
                   <td>
@@ -85,12 +118,12 @@ const ScoreTables = () => {
                         height="45"
                       />
                       <div className="ms-3">
-                        <h6 className="mb-0">{tdata.name}</h6>
+                        <h6 className="mb-0">{tdata.nickname}</h6>
                         {/* <span className="text-muted">{tdata.email}</span> */}
                       </div>
                     </div>
                   </td>
-                  <td>{tdata.weeks}</td>
+                  <td>{tdata.score}</td>
                 </tr>
               ))}
             </tbody>
