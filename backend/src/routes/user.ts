@@ -87,7 +87,12 @@ const router = express.Router();
  *                       answers:
  *                         type: array
  *                         items:
- *                           $ref: '#/components/schemas/Answer'
+ *                           allOf:
+ *                             - $ref: '#/components/schemas/Answer'
+ *                             - type: object
+ *                               properties:
+ *                                 question:
+ *                                   $ref: '#/components/schemas/Question'
  */
 router.get('/user/:id(\\d+)/', userController.getUser);
 

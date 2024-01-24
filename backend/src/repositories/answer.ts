@@ -58,11 +58,20 @@ class AnswerRepository {
     return result;
   }
 
-  async findAnswersByUserId(userId: number): Promise<schema.Answer[]> {
+  async findAnswersByUserId(
+    userId: number
+  ): Promise<Array<schema.Answer & { question: schema.Question }>> {
     const result = await db
-      .select()
+      .select({
+        ...getTableColumns(schema.answers),
+        question: getTableColumns(schema.questions),
+      })
       .from(schema.answers)
       .where(eq(schema.answers.userId, userId))
+      .innerJoin(
+        schema.questions,
+        eq(schema.answers.questionId, schema.questions.id)
+      )
       .orderBy(desc(schema.answers.createdAt));
     return result;
   }
