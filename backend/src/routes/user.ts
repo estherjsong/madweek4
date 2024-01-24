@@ -72,8 +72,14 @@ const router = express.Router();
  *                               properties:
  *                                 count:
  *                                   type: integer
+ *                                   description: 총 활동 횟수
+ *                                 questionCount:
+ *                                   type: integer
  *                                   description: 질문 횟수
- *                         description: 가장 많이 질문한 언어
+ *                                 answerCount:
+ *                                   type: integer
+ *                                   description: 답변 횟수
+ *                         description: 가장 많이 활동한 언어 3개
  *                       questions:
  *                         type: array
  *                         items:
@@ -180,5 +186,33 @@ router.post('/logout', isAuthenticated, userController.postLogout);
  *                 $ref: '#/components/schemas/User'
  */
 router.post('/signup', userController.postSignup);
+
+/**
+ *  @swagger
+ *  paths:
+ *   /rank:
+ *     get:
+ *       summary: 랭킹 상위 유저 5명 반환
+ *       tags: [User]
+ *       responses:
+ *         "200":
+ *           description: 랭킹 상위 유저 5명
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: array
+ *                 items:
+ *                   allOf:
+ *                     - $ref: '#/components/schemas/User'
+ *                     - type: object
+ *                       properties:
+ *                         rank:
+ *                           type: integer
+ *                           description: 유저의 순위
+ *                         score:
+ *                           type: integer
+ *                           description: 유저의 점수
+ */
+router.get('/rank', userController.getRank);
 
 export default router;
