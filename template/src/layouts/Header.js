@@ -54,6 +54,7 @@ const Header = () => {
   const Handletoggle = () => {
     setIsOpen(!isOpen);
   };
+  
   const showMobilemenu = () => {
     document.getElementById("sidebarArea").classList.toggle("showSidebar");
   };
