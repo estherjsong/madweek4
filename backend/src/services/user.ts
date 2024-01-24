@@ -2,20 +2,10 @@ import { type Request } from 'express';
 import { body } from 'express-validator';
 
 import userRepository from '@repositories/user';
+import { type User } from '@src/schema';
 
 class UserService {
   async validateUser(req: Request): Promise<void> {
-    await body('userId', '아이디는 6-12자 이내의 영문/숫자만 사용 가능합니다.')
-      .trim()
-      .isString()
-      .isLength({ min: 6, max: 12 })
-      .isAlphanumeric()
-      .custom(async (value: string) => {
-        if ((await userRepository.countUserByUserId(value)) > 0) {
-          throw new Error('이미 존재하는 아이디입니다.');
-        }
-      })
-      .run(req);
     await body(
       'password',
       '비밀번호는 8자 이상의 문자/숫자가 포함되어야합니다.'
@@ -38,7 +28,11 @@ class UserService {
       .isString()
       .isLength({ min: 3, max: 16 })
       .custom(async (value: string) => {
-        if ((await userRepository.countUserByNickname(value)) > 0) {
+        const user = await userRepository.findUserByNickname(value);
+        if (
+          user != null &&
+          (req.user == null || (req.user as User).id !== user.id)
+        ) {
           throw new Error('이미 존재하는 닉네임입니다.');
         }
       })
