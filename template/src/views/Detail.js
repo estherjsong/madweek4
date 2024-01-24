@@ -36,6 +36,7 @@ const Detail = () => {
     const [code, setCode] = useState('');
     const [answersList, setAnswersList] = useState([]);
 
+    const [likes, setLikes] = useState({});
     const [lookingLines, setLookingLines] = useState([]);
     const [lineCounts, setLineCounts] = useState([]);
     const [lineCount, setLineCount] = useState(0);
@@ -61,6 +62,71 @@ const Detail = () => {
         setCode(editor)
     };
 
+    const handleLike = async (answerId, like) => {
+        try {
+            const currentLike = likes[answerId];
+            console.log("sendinglike", currentLike, currentLike === like ? 0 : like)
+
+            const response = await fetch(`${API_BASE_URL}/answer/like/${answerId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    like: currentLike === like ? 0 : like,
+                }),
+            });
+
+            const result = await response.json();
+
+            console.log("response", response);
+
+            if (response.ok) {
+                console.log('Answer like post successful', result);
+                fetchAnswers();
+            } else {
+                console.log('Answer like post failed:', result);
+                result.errors.forEach((error) => {
+                    // error.msg에 따라 각각의 처리
+                    switch (error.msg) {
+                        case '사용자가 작성한 답변입니다.':
+                            alert('Likes and dislikes are not available for your own responses.');
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('An error occurred during posting:', error);
+            // 여기에서 적절한 에러 처리를 수행할 수 있습니다.
+        }
+    }
+    async function getLike(answerId) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/answer/like/${answerId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            })
+            const result = await response.json();
+
+            console.log("response", response)
+
+            if (response.ok) {
+                console.log('Answer getLike successful', result);
+                console.log(result.like, typeof (result.like));
+                return result.like;
+            } else {
+                console.log('Answer getLike failed:', result);
+            }
+        } catch (error) {
+            console.error('An error occurred during posting:', error);
+            // 여기에서 적절한 에러 처리를 수행할 수 있습니다.
+        }
+        return 0;
+    }
+
     const handleAnswerPost = async () => {
         console.log(comments);
         try {
@@ -81,6 +147,9 @@ const Detail = () => {
 
             if (response.ok) {
                 console.log('Answer post successful', result);
+                fetchAnswers();
+                setCode('');
+                setDescription('');
             } else {
                 console.log('Answer post failed:', result);
             }
@@ -107,6 +176,36 @@ const Detail = () => {
         });
     };
 
+    // getLike 함수를 한 번만 호출하여 결과를 저장
+    useEffect(() => {
+        const fetchLikes = async () => {
+            const likesMap = {};
+            for (const answer of answersList) {
+                const likeValue = await getLike(answer.id);
+                likesMap[answer.id] = likeValue;
+            }
+            setLikes(likesMap);
+        };
+
+        fetchLikes();
+    }, [answersList]);
+
+    const fetchAnswers = async () => {
+        try {
+            const response = await axios.get(`/answer/${questionId}`);
+            setAnswersList(response.data);
+            console.log("fetchComments", response.data);
+            response.data.forEach((answer, index) => {
+                const codeString = answer.code || '';
+                const lines = (codeString.match(/\n/g) || []).length + 1;
+                updateLineCount(index, lines);
+                console.log("update Likes", likes);
+            })
+            // console.log(typeof id, typeof post.userId, parseInt(id)===post.userId)
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
     const toggle = () => setModal(!modal);
 
     useEffect(() => {
@@ -123,22 +222,6 @@ const Detail = () => {
                 setLoading(false); // Set loading to false regardless of success or failure
             }
         };
-
-        const fetchAnswers = async () => {
-            try {
-                const response = await axios.get(`/answer/${questionId}`);
-                setAnswersList(response.data);
-                console.log("fetchComments", response.data);
-                response.data.forEach((answer, index) => {
-                    const codeString = answer.code || '';
-                    const lines = (codeString.match(/\n/g) || []).length + 1;
-                    updateLineCount(index, lines)
-                })
-                // console.log(typeof id, typeof post.userId, parseInt(id)===post.userId)
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        }
 
         // Call the fetchData function when the component mounts or currentPage changes
         fetchAnswers();
@@ -166,6 +249,33 @@ const Detail = () => {
             navigate('/questions');
         }
     };
+
+
+
+    const renderLikeButton = (answerId, likeType) => (
+        <Button
+            className="btn ms-2 me-2"
+            outline
+            color={likeType === -1 ? "danger" : "primary"}
+            size="sm"
+            onClick={() => handleLike(answerId, likeType)}
+        >
+            {likes[answerId] === likeType ? (
+                likeType === -1 ? (
+                    <i className="bi bi-hand-thumbs-down-fill"></i>
+                ) : (
+                    <i className="bi bi-hand-thumbs-up-fill"></i>
+                )
+            ) : (
+                likeType === -1 ? (
+                    <i className="bi bi-hand-thumbs-down"></i>
+                ) : (
+                    <i className="bi bi-hand-thumbs-up"></i>
+                )
+            )}
+        </Button>
+    );
+
 
 
     return (
@@ -198,6 +308,24 @@ const Detail = () => {
                                 </div>
                             </CardTitle>
                             <CardBody>
+                                {/* <Row>
+                                    <Col sm="5" lg="4" xl="4" xxl="4" className="order-2">
+                                        <CardText>
+                                            {post.title}
+                                        </CardText>
+                                    </Col>
+                                    <Col sm="7" lg="8" xl="8" xxl="8" className="order-1">
+                                        <CodeMirror
+                                            className='mb-3'
+                                            id="code"
+                                            value={post.code}
+                                            // value={'#include <stdio.h>\n\nint main() {\n    for(int i=0; i<5; i++){\n        for(int j=0; j<5; j++){\n            printf(\'%d %d\', i, j);\n        }\n    }\n     return 0;\n}'}
+                                            theme={darcula}
+                                            minHeight={'100px'}
+                                            extensions={[loadLanguage(post.tags[0].name), EditorView.editable.of(false), EditorState.readOnly.of(true)]}
+                                        />
+                                    </Col>
+                                </Row> */}
                                 <CardText>
                                     {post.title}
                                 </CardText>
@@ -239,11 +367,11 @@ const Detail = () => {
                                             {/* <i className="bi bi-chevron-left me-2"></i> */}
                                             # {index + 1} &nbsp; Answer
                                         </div>
-                                        <Button className="btn me-2" outline color="primary" size="sm">
-                                            <i className="bi bi-hand-thumbs-up me-2"> </i>
-                                            {/* <i className ="bi bi-hand-thumbs-up-fill me-2"></i> */}
+                                        <div>
+                                            {renderLikeButton(answer.id, -1)}
                                             {answer.like}
-                                        </Button>
+                                            {renderLikeButton(answer.id, 1)}
+                                        </div>
                                     </CardTitle>
                                     <CardBody>
                                         <Row>
