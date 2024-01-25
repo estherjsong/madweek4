@@ -16,16 +16,23 @@ import {
 } from "reactstrap";
 import Logo from "./Logo";
 import { ReactComponent as LogoWhite } from "../assets/images/logos/adminprowhite.svg";
-import user1 from "../assets/images/users/user4.jpg";
 import RegisterForm from "../views/Register";
 import LoginForm from "../views/Login";
 import LogoutForm from "../views/Logout";
 import { API_BASE_URL } from "../config";
+import user0 from "../assets/images/users/user0.jpg";
+import user1 from "../assets/images/users/user1.jpg";
+import user2 from "../assets/images/users/user2.jpg";
+import user3 from "../assets/images/users/user3.jpg";
+import user4 from "../assets/images/users/user4.jpg";
+import user5 from "../assets/images/users/user5.jpg";
+const userImages = [user0, user1, user2, user3, user4, user5];
 
 // const Header = ({ isLoggedIn, onLogout }) => {
 const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const id = localStorage.getItem('id');
+  const profileId = localStorage.getItem('profileId') ? localStorage.getItem('profileId') : 0;
 
   useEffect(() => {
     // Check the authentication status when the component mounts
@@ -84,7 +91,7 @@ const Header = () => {
 
     // 컴포넌트가 언마운트될 때 clearInterval을 사용하여 interval 정리
     return () => clearInterval(intervalId);
-  }, []);
+  }, [isLoggedIn]);
 
   useEffect(() => {
     setNotiColor(howManyNoti === 0 ? 'secondary' : 'primary');
@@ -168,7 +175,7 @@ const Header = () => {
         <Dropdown isOpen={dropdownOpen} toggle={toggle}>
           <DropdownToggle color="transparent">
             <img
-              src={user1}
+              src={userImages[profileId]}
               alt="profile"
               className="rounded-circle"
               width="30"

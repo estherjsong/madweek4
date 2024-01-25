@@ -14,18 +14,28 @@ import {
 import React, { useState } from 'react';
 import { API_BASE_URL } from "../config";
 import { BackgroundOverlay } from '../components/CommonStyles';
+import user0 from "../assets/images/users/user0.jpg";
+import user1 from "../assets/images/users/user1.jpg";
+import user2 from "../assets/images/users/user2.jpg";
+import user3 from "../assets/images/users/user3.jpg";
+import user4 from "../assets/images/users/user4.jpg";
+import user5 from "../assets/images/users/user5.jpg";
+const userImages = [user0, user1, user2, user3, user4, user5];
+
 
 const RegisterForm = ({ isVisible, onClose, onLog }) => {
+
     const [formData, setFormData] = useState({
         userId: '',
         password: '',
         confirmPassword: '',
         nickname: '',
         introduction: '',
-        selectedImage: 'user1.jpg',
+        profileId: 0,
     });
 
     const [errors, setErrors] = useState({});
+    const [openImages, setOpenImages] = useState(false);
 
     // Validation function
     const validateForm = () => {
@@ -145,41 +155,66 @@ const RegisterForm = ({ isVisible, onClose, onLog }) => {
     };
 
     const handleImageChange = (e) => {
+        setOpenImages(!openImages);
         setFormData({
             ...formData,
-            selectedImage: e.target.value,
+            profileId: e,
         });
-    };
+    }
 
     return (
         <BackgroundOverlay isVisible={isVisible} onClick={onClose}>
-            <Card isVisible={isVisible} onClick={(e) => e.stopPropagation()} style={{ width: '40%' }}>
+            <Card isVisible={isVisible} onClick={(e) => e.stopPropagation()} style={{ width: '30%', minWidth: '400px', maxHeight: '80vh', overflowY: 'auto' }}>
                 <CardTitle tag="h6" className="border-bottom p-3 mb-0">
                     <i class="bi bi-pencil-square">  </i>
                     Register
                 </CardTitle>
                 <CardBody>
                     <Form>
-                        <FormGroup>
-                            <Label for="selectedImage">Select Profile Image:</Label>
-                            <Input
-                                id="selectedImage"
-                                name="selectedImage"
-                                type="select"
-                                value={formData.selectedImage}
-                                onChange={handleImageChange}
-                            >
-                                <option value="user1.jpg">User 1</option>
-                                <option value="user2.jpg">User 2</option>
-                                <option value="user3.jpg">User 3</option>
-                                <option value="user4.jpg">User 4</option>
-                                <option value="user5.jpg">User 5</option>
-                            </Input>
-                        </FormGroup>
-                        <div>
-                            {/* Display the selected image */}
-                            <img src={`assets/images/users/${formData.selectedImage}`} alt={`Selected User: ${formData.selectedImage}`} />
-                        </div>
+                        {!openImages && (
+                            <div className="d-flex flex-column justify-content-center align-items-center mb-3" style={{ height: '200px' }}>
+                                {/* <i class="bi bi-person-circle" style={{ fontSize: '150px' }}></i> */}
+                                <img src={userImages[formData.profileId]}
+                                    className="rounded-circle"
+                                    style={{ width: '180px', height: '180px' }}
+                                    onClick={() => setOpenImages(!openImages)}
+                                    alt="click and pick your profile image" />
+                            </div>
+                        )}
+
+                        {
+                            openImages && (
+                                <div className="d-flex flex-column justify-content-center align-items-center mb-3" style={{ height: '200px' }}>
+                                    <Row className="d-flex justify-content-center align-items-center mb-1 my-auto">
+                                        {userImages.slice(0, 3).map((userImage, index) => (
+                                            <Col key={index} lg="2">
+                                                <img
+                                                    src={userImage}
+                                                    className="rounded-circle me-2"
+                                                    style={{ width: '15%', minWidth: '50px' }}
+                                                    alt={`User ${index + 1}`}
+                                                    onClick={() => { handleImageChange(index) }}
+                                                />
+                                            </Col>
+                                        ))}
+                                    </Row>
+                                    <Row className="d-flex justify-content-center align-items-center mb-5 my-auto">
+                                        {userImages.slice(3, 6).map((userImage, index) => (
+                                            <Col key={index} lg="2">
+                                                <img
+                                                    src={userImage}
+                                                    className="rounded-circle"
+                                                    style={{ width: '15%', minWidth: '50px' }}
+                                                    alt={`User ${index + 1}`}
+                                                    onClick={() => { handleImageChange(index+3) }}
+                                                />
+                                            </Col>
+                                        ))}
+                                    </Row>
+                                </div>
+                            )
+                        }
+
                         <FormGroup>
                             <Label for="userId">ID</Label>
                             <Input

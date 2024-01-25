@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { API_BASE_URL } from "../config";
+import { formatDateString } from "../dateUtils";
+import { useParams } from "react-router-dom";
 import {
     Card,
     CardImg,
@@ -19,9 +21,13 @@ import QuestionsTable from "../components/questionTable";
 import Gold from "../assets/images/Gold.png"
 import Silver from "../assets/images/Silver.png"
 import Bronze from "../assets/images/Bronze.png"
-import user1 from "../assets/images/users/user4.jpg";
-import { formatDateString } from "../dateUtils";
-import { useParams } from "react-router-dom";
+import user0 from "../assets/images/users/user0.jpg";
+import user1 from "../assets/images/users/user1.jpg";
+import user2 from "../assets/images/users/user2.jpg";
+import user3 from "../assets/images/users/user3.jpg";
+import user4 from "../assets/images/users/user4.jpg";
+import user5 from "../assets/images/users/user5.jpg";
+const userImages = [user0, user1, user2, user3, user4, user5];
 
 const UserPage = () => {
     const { paramsid } = useParams();
@@ -36,6 +42,7 @@ const UserPage = () => {
     const [topLanguages, setTopLanguages] = useState([]);
     const [created, setCreated] = useState('');
     const [introduction, setIntroduction] = useState('');
+    const [profileId, setProfileId] = useState(0);
 
     const fetchData = async () => {
         try {
@@ -60,6 +67,7 @@ const UserPage = () => {
                 setIntroduction(result.introduction);
                 setUserId(result.userId);
                 setNickname(result.nickname);
+                setProfileId(result.profileId);
                 console.log("questions from mypage", questions);
                 console.log("answers from mypage", answers);
                 console.log("toplanguages", topLanguages);
@@ -88,7 +96,7 @@ const UserPage = () => {
                         <Row className="justify-content-center mt-4 mb-4">
                             <Col xs="auto">
                                 <img
-                                    src={user1}
+                                    src={userImages[profileId]}
                                     alt="profile"
                                     className="rounded-circle"
                                     width="80%"
@@ -160,7 +168,7 @@ const UserPage = () => {
                     <Row>
                         {/* <h5 className="mb-3 mt-3">My Questions</h5> */}
                         <Col lg="12">
-                            <QuestionsTable listName={'My Questions'} questionList={questions} addShow={true}/>
+                            <QuestionsTable listName={'My Questions'} questionList={questions} addShow={true} />
                         </Col>
                     </Row>
 
