@@ -12,7 +12,7 @@ export async function createLLMAnswer(
 
   const chatModel = new ChatOpenAI({
     openAIApiKey: OPENAI_API_KEY,
-    modelName: ENVIRONMENT === 'production' ? 'gpt-4-1106-preview' : undefined,
+    // modelName: ENVIRONMENT === 'production' ? 'gpt-4-1106-preview' : undefined,
     temperature: 0.1,
   });
   const prompt = ChatPromptTemplate.fromMessages([

@@ -131,7 +131,7 @@ class QuestionService {
 
     void notificationRepository.createNotification(
       '올리신 질문에 AI 답변이 달렸습니다!',
-      '',
+      question.id.toString(),
       question.userId
     );
   }

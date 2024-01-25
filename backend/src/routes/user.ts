@@ -28,6 +28,9 @@ const router = express.Router();
  *          nickname:
  *            type: string
  *            description: 유저 닉네임
+ *          profileId:
+ *            type: number
+ *            description: 프로필 이미지 값
  *          introduction:
  *            type: string
  *            description: 한 줄 자기소개
@@ -179,6 +182,9 @@ router.post('/logout', isAuthenticated, userController.postLogout);
  *                 nickname:
  *                   type: string
  *                   description: 가입할 유저 닉네임
+ *                 profileId:
+ *                   type: number
+ *                   description: 프로필 이미지 값
  *                 introduction:
  *                   type: string
  *                   description: 가입할 유저 자기소개
@@ -215,6 +221,9 @@ router.post('/signup', userController.postSignup);
  *                 nickname:
  *                   type: string
  *                   description: 수정할 유저 닉네임
+ *                 profileId:
+ *                   type: number
+ *                   description: 프로필 이미지 값
  *                 introduction:
  *                   type: string
  *                   description: 수정할 유저 자기소개

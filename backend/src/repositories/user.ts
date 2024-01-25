@@ -127,11 +127,12 @@ class UserRepository {
     userId: string,
     password: string,
     nickname: string,
+    profileId: number,
     introduction: string
   ): Promise<schema.User> {
     const [result] = await db
       .insert(schema.users)
-      .values({ userId, password, nickname, introduction })
+      .values({ userId, password, nickname, profileId, introduction })
       .returning();
     return result;
   }
@@ -140,11 +141,12 @@ class UserRepository {
     id: number,
     password: string,
     nickname: string,
+    profileId: number,
     introduction: string
   ): Promise<schema.User> {
     const [result] = await db
       .update(schema.users)
-      .set({ password, nickname, introduction })
+      .set({ password, nickname, profileId, introduction })
       .where(eq(schema.users.id, id))
       .returning();
     return result;

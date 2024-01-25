@@ -108,15 +108,16 @@ class UserController {
       return;
     }
 
-    const data: Record<string, string> = matchedData(req);
+    const data = matchedData(req);
 
     try {
-      const hash = await argon2.hash(data.password);
+      const hash = await argon2.hash(data.password as string);
       const user = await userRepository.createUser(
-        data.userId,
+        data.userId as string,
         hash,
-        data.nickname,
-        data.introduction
+        data.nickname as string,
+        data.profileId as number,
+        data.introduction as string
       );
       req.logIn(user, (error) => {
         if (error != null) {
@@ -141,15 +142,16 @@ class UserController {
       return;
     }
 
-    const data: Record<string, string> = matchedData(req);
+    const data = matchedData(req);
 
     try {
-      const hash = await argon2.hash(data.password);
+      const hash = await argon2.hash(data.password as string);
       const user = await userRepository.updateUserById(
         (req.user as User).id,
         hash,
-        data.nickname,
-        data.introduction
+        data.nickname as string,
+        data.profileId as number,
+        data.introduction as string
       );
 
       const { password, ...userWithoutPassword } = user;
