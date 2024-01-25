@@ -22,6 +22,7 @@ const RegisterForm = ({ isVisible, onClose, onLog }) => {
         confirmPassword: '',
         nickname: '',
         introduction: '',
+        selectedImage: 'user1.jpg',
     });
 
     const [errors, setErrors] = useState({});
@@ -143,6 +144,13 @@ const RegisterForm = ({ isVisible, onClose, onLog }) => {
         });
     };
 
+    const handleImageChange = (e) => {
+        setFormData({
+            ...formData,
+            selectedImage: e.target.value,
+        });
+    };
+
     return (
         <BackgroundOverlay isVisible={isVisible} onClick={onClose}>
             <Card isVisible={isVisible} onClick={(e) => e.stopPropagation()} style={{ width: '40%' }}>
@@ -152,6 +160,26 @@ const RegisterForm = ({ isVisible, onClose, onLog }) => {
                 </CardTitle>
                 <CardBody>
                     <Form>
+                        <FormGroup>
+                            <Label for="selectedImage">Select Profile Image:</Label>
+                            <Input
+                                id="selectedImage"
+                                name="selectedImage"
+                                type="select"
+                                value={formData.selectedImage}
+                                onChange={handleImageChange}
+                            >
+                                <option value="user1.jpg">User 1</option>
+                                <option value="user2.jpg">User 2</option>
+                                <option value="user3.jpg">User 3</option>
+                                <option value="user4.jpg">User 4</option>
+                                <option value="user5.jpg">User 5</option>
+                            </Input>
+                        </FormGroup>
+                        <div>
+                            {/* Display the selected image */}
+                            <img src={`assets/images/users/${formData.selectedImage}`} alt={`Selected User: ${formData.selectedImage}`} />
+                        </div>
                         <FormGroup>
                             <Label for="userId">ID</Label>
                             <Input

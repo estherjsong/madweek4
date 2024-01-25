@@ -205,7 +205,7 @@ const Questions = () => {
                                                 </div>
                                                 <div>
                                                     <small>
-                                                        <Link style={{ textDecoration: 'none', color: 'inherit' }}>
+                                                        <Link to={`/userpage/${data.user.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                                             {data.user.nickname}
                                                         </Link>
                                                         &nbsp;

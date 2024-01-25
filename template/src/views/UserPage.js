@@ -21,11 +21,15 @@ import Silver from "../assets/images/Silver.png"
 import Bronze from "../assets/images/Bronze.png"
 import user1 from "../assets/images/users/user4.jpg";
 import { formatDateString } from "../dateUtils";
+import { useParams } from "react-router-dom";
 
 const UserPage = () => {
+    const { paramsid } = useParams();
     const id = localStorage.getItem('id');
-    const userId = localStorage.getItem('userId');
-    const nickname = localStorage.getItem('nickname');
+    // const userId = localStorage.getItem('userId');
+    // const nickname = localStorage.getItem('nickname');
+    const [userId, setUserId] = useState('');
+    const [nickname, setNickname] = useState('');
     const [answers, setAnswers] = useState([]);
     const [questions, setQuestions] = useState([]);
     const [score, setScore] = useState(0);
@@ -35,7 +39,7 @@ const UserPage = () => {
 
     const fetchData = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/user/${id}`, {
+            const response = await fetch(`${API_BASE_URL}/user/${paramsid ? paramsid : id}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -54,6 +58,8 @@ const UserPage = () => {
                 setScore(result.score);
                 setCreated(result.createdAt);
                 setIntroduction(result.introduction);
+                setUserId(result.userId);
+                setNickname(result.nickname);
                 console.log("questions from mypage", questions);
                 console.log("answers from mypage", answers);
                 console.log("toplanguages", topLanguages);
