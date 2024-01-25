@@ -16,20 +16,28 @@ import {
 } from "reactstrap";
 import Logo from "./Logo";
 import { ReactComponent as LogoWhite } from "../assets/images/logos/adminprowhite.svg";
-import user1 from "../assets/images/users/user4.jpg";
 import RegisterForm from "../views/Register";
 import LoginForm from "../views/Login";
 import LogoutForm from "../views/Logout";
 import { API_BASE_URL } from "../config";
+import user0 from "../assets/images/users/user0.jpg";
+import user1 from "../assets/images/users/user1.jpg";
+import user2 from "../assets/images/users/user2.jpg";
+import user3 from "../assets/images/users/user3.jpg";
+import user4 from "../assets/images/users/user4.jpg";
+import user5 from "../assets/images/users/user5.jpg";
+const userImages = [user0, user1, user2, user3, user4, user5];
 
 // const Header = ({ isLoggedIn, onLogout }) => {
 const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const id = localStorage.getItem('id');
+  const [profileId, setProfileId] = useState(0);
 
   useEffect(() => {
     // Check the authentication status when the component mounts
     checkAuthenticationStatus();
+    setProfileId(localStorage.getItem('profileId') ? localStorage.getItem('profileId') : 0);
   }, []);
 
   const checkAuthenticationStatus = async () => {
@@ -37,16 +45,16 @@ const Header = () => {
     setIsLoggedIn(!!userId);
   };
 
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
-  const [dropdownOpen, setDropdownOpen] = React.useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const [isRegisterModalVisible, setRegisterModalVisible] = React.useState(false);
-  const [isLoginModalVisible, setLoginModalVisible] = React.useState(false);
-  const [isLogoutModalVisible, setLogoutModalVisible] = React.useState(false);
+  const [isRegisterModalVisible, setRegisterModalVisible] = useState(false);
+  const [isLoginModalVisible, setLoginModalVisible] = useState(false);
+  const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
 
-  const [howManyNoti, setHowManyNoti] = React.useState(0);
-  const [notiColor, setNotiColor] = React.useState('secondary');
+  const [howManyNoti, setHowManyNoti] = useState(0);
+  const [notiColor, setNotiColor] = useState('secondary');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,7 +92,7 @@ const Header = () => {
 
     // 컴포넌트가 언마운트될 때 clearInterval을 사용하여 interval 정리
     return () => clearInterval(intervalId);
-  }, []);
+  }, [isLoggedIn]);
 
   useEffect(() => {
     setNotiColor(howManyNoti === 0 ? 'secondary' : 'primary');
@@ -168,7 +176,7 @@ const Header = () => {
         <Dropdown isOpen={dropdownOpen} toggle={toggle}>
           <DropdownToggle color="transparent">
             <img
-              src={user1}
+              src={userImages[profileId]}
               alt="profile"
               className="rounded-circle"
               width="30"
@@ -177,12 +185,9 @@ const Header = () => {
           <DropdownMenu>
             {isLoggedIn && (
               <>
-                <DropdownItem header>Info</DropdownItem>
                 <Link to={`/userpage/${id}`} style={{ textDecoration: 'none' }}>
                   <DropdownItem>My Account</DropdownItem>
                 </Link>
-                <DropdownItem>Edit Profile</DropdownItem>
-                <DropdownItem divider />
               </>
             )}
             {/* <DropdownItem>My Balance</DropdownItem>

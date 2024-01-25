@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Loader from "../layouts/loader/Loader";
 import TagShow from "../components/TagShow";
 
-const QuestionsTable = ({ listName, questionList }) => {
+const QuestionsTable = ({ listName, questionList, addShow }) => {
     const navigate = useNavigate();
     const postsPerPage = 5;
     const [currentPage, setCurrentPage] = useState(1);
@@ -44,18 +44,20 @@ const QuestionsTable = ({ listName, questionList }) => {
                                     <i className="bi bi-card-text me-2"> </i>
                                     {listName}
                                 </div>
-
-                                <div className="d-flex align-items-center">
-                                    {/* Add the grid classes to control the width of elements */}
-                                    <div className="me-3">
-                                        <Link to="/ask">
-                                            <Button className="btn" color="primary" size="sm">
-                                                <i className="bi bi-plus"> </i>
-                                                <span className="d-none d-sm-inline"> Add Question</span>
-                                            </Button>
-                                        </Link>
+                                {addShow && (
+                                    <div className="d-flex align-items-center">
+                                        {/* Add the grid classes to control the width of elements */}
+                                        <div className="me-3">
+                                            <Link to="/ask">
+                                                <Button className="btn" color="primary" size="sm">
+                                                    <i className="bi bi-plus"> </i>
+                                                    <span className="d-none d-sm-inline"> Add Question</span>
+                                                </Button>
+                                            </Link>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
+
                             </CardTitle>
 
                             <CardBody className="">

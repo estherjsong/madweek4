@@ -80,7 +80,8 @@ const LoginForm = ({ isVisible, onClose, onReg }) => {
                     localStorage.setItem('userId', result.userId)
                     localStorage.setItem('nickname', result.nickname)
                     localStorage.setItem('id', result.id)
-                    localStorage.setItem('introductioin', result.introduction)
+                    localStorage.setItem('introduction', result.introduction)
+                    localStorage.setItem('profileId', result.profileId)
 
                     // cookie.save('userId',result.userId, {
                     //     path: '/',
@@ -137,7 +138,7 @@ const LoginForm = ({ isVisible, onClose, onReg }) => {
 
     return (
         <BackgroundOverlay isVisible={isVisible} onClick={onClose}>
-            <Card isVisible={isVisible} onClick={(e) => e.stopPropagation()} style={{ width: '30%' }}>
+            <Card isVisible={isVisible} onClick={(e) => e.stopPropagation()} style={{ width: '30%', minWidth: '350px'}}>
                 <CardTitle tag="h6" className="border-bottom p-3 mb-0">
                     <i class="bi bi-box-arrow-in-right"> </i>
                     Login

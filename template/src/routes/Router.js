@@ -38,7 +38,7 @@ const ThemeRoutes = [
       { path: "/questions", exact: true, element: <Questions /> },
       { path: "/detail/:questionId", exact: true, element: <Detail /> },
       { path: "/notifications", exact: true, element: <Notifications /> },
-      { path: "/userpage/:userId", exact: true, element: <UserPage /> },
+      { path: "/userpage/:paramsid", exact: true, element: <UserPage /> },
       { path: "/alerts", exact: true, element: <Alerts /> },
       { path: "/badges", exact: true, element: <Badges /> },
       { path: "/buttons", exact: true, element: <Buttons /> },
