@@ -15,6 +15,7 @@ import {
     Col,
 } from "reactstrap";
 import QuestionsTable from "../components/questionTable";
+import EditProfileForm from "../views/EditProfile";
 // import { ReactComponent as Gold } from "../assets/images/Gold.svg";
 // import { ReactComponent as Silver } from "../assets/images/Silver.svg";
 // import { ReactComponent as Bronze } from "../assets/images/Bronze.svg";
@@ -43,6 +44,10 @@ const UserPage = () => {
     const [created, setCreated] = useState('');
     const [introduction, setIntroduction] = useState('');
     const [profileId, setProfileId] = useState(0);
+
+
+    const [isEditModalVisible, setEditModalVisible] = useState(false);
+    const toggleEdit = () => setEditModalVisible(!isEditModalVisible);
 
     const fetchData = async () => {
         try {
@@ -91,7 +96,13 @@ const UserPage = () => {
                 <Col lg="4" style={{ position: 'sticky', top: '0', maxHeight: '100vh', overflowY: 'auto' }}>
                     <Card body className="text-center">
                         <CardTitle tag="h4" className="mt-3">
-                            Profile
+                            {id === paramsid ? (
+                                <span>My Profile</span>
+                            ) : (
+                                <span>
+                                    Profile
+                                </span>
+                            )}
                         </CardTitle>
                         <Row className="justify-content-center mt-4 mb-4">
                             <Col xs="auto">
@@ -124,7 +135,7 @@ const UserPage = () => {
                         {id === paramsid ? (
                             <Row className="justify-content-center mt-3 mb-5">
                                 <Col xs="auto">
-                                    <Button outline color="primary">
+                                    <Button outline color="primary" onClick={toggleEdit}>
                                         <i className="bi bi-pencil me-3"></i>
                                         Edit Profile
                                     </Button>
@@ -193,6 +204,9 @@ const UserPage = () => {
                 </Col>
             </Row>
 
+            {isEditModalVisible && (
+                <EditProfileForm isVisible={isEditModalVisible} onClose={toggleEdit} />
+            )}
         </div >
     )
 }

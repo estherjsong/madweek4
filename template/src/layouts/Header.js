@@ -32,11 +32,12 @@ const userImages = [user0, user1, user2, user3, user4, user5];
 const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const id = localStorage.getItem('id');
-  const profileId = localStorage.getItem('profileId') ? localStorage.getItem('profileId') : 0;
+  const [profileId, setProfileId] = useState(0);
 
   useEffect(() => {
     // Check the authentication status when the component mounts
     checkAuthenticationStatus();
+    setProfileId(localStorage.getItem('profileId') ? localStorage.getItem('profileId') : 0);
   }, []);
 
   const checkAuthenticationStatus = async () => {
@@ -44,16 +45,16 @@ const Header = () => {
     setIsLoggedIn(!!userId);
   };
 
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
-  const [dropdownOpen, setDropdownOpen] = React.useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const [isRegisterModalVisible, setRegisterModalVisible] = React.useState(false);
-  const [isLoginModalVisible, setLoginModalVisible] = React.useState(false);
-  const [isLogoutModalVisible, setLogoutModalVisible] = React.useState(false);
+  const [isRegisterModalVisible, setRegisterModalVisible] = useState(false);
+  const [isLoginModalVisible, setLoginModalVisible] = useState(false);
+  const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
 
-  const [howManyNoti, setHowManyNoti] = React.useState(0);
-  const [notiColor, setNotiColor] = React.useState('secondary');
+  const [howManyNoti, setHowManyNoti] = useState(0);
+  const [notiColor, setNotiColor] = useState('secondary');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -184,12 +185,9 @@ const Header = () => {
           <DropdownMenu>
             {isLoggedIn && (
               <>
-                <DropdownItem header>Info</DropdownItem>
                 <Link to={`/userpage/${id}`} style={{ textDecoration: 'none' }}>
                   <DropdownItem>My Account</DropdownItem>
                 </Link>
-                <DropdownItem>Edit Profile</DropdownItem>
-                <DropdownItem divider />
               </>
             )}
             {/* <DropdownItem>My Balance</DropdownItem>

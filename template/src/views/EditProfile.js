@@ -11,20 +11,34 @@ import {
     Input,
     FormText,
 } from "reactstrap";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../config";
 import { BackgroundOverlay } from '../components/CommonStyles';
+import user0 from "../assets/images/users/user0.jpg";
+import user1 from "../assets/images/users/user1.jpg";
+import user2 from "../assets/images/users/user2.jpg";
+import user3 from "../assets/images/users/user3.jpg";
+import user4 from "../assets/images/users/user4.jpg";
+import user5 from "../assets/images/users/user5.jpg";
+const userImages = [user0, user1, user2, user3, user4, user5];
 
-const RegisterForm = ({ isVisible, onClose, onLog }) => {
+
+const EditProfileForm = ({ isVisible, onClose }) => {
+    const navigate = useNavigate();
+    const id = localStorage.getItem('id');
+
     const [formData, setFormData] = useState({
         userId: '',
         password: '',
         confirmPassword: '',
         nickname: '',
         introduction: '',
+        profileId: 0,
     });
 
     const [errors, setErrors] = useState({});
+    const [openImages, setOpenImages] = useState(false);
 
     // Validation function
     const validateForm = () => {
@@ -52,6 +66,41 @@ const RegisterForm = ({ isVisible, onClose, onLog }) => {
         return Object.keys(newErrors).length === 0;
     };
 
+    const fetchData = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/user/${id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            })
+            const result = await response.json();
+
+            console.log("response", response)
+
+            if (response.ok) {
+                console.log('User information get successful', result);
+                setFormData({
+                    ...formData,
+                    nickname: result.nickname,
+                    introduction: result.introduction,
+                    userId: result.userId,
+                    profileId: result.profileId,
+                });
+            } else {
+                console.log('User information get failed:', result);
+            }
+        } catch (error) {
+            console.error('An error occurred during getting:', error);
+            // 여기에서 적절한 에러 처리를 수행할 수 있습니다.
+        }
+    }
+
+    useEffect(() => {
+        fetchData();
+    }, [])
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -63,8 +112,8 @@ const RegisterForm = ({ isVisible, onClose, onLog }) => {
         if (isValid) {
             try {
                 // Perform your form submission logic here
-                const response = await fetch(`${API_BASE_URL}/signup`, {
-                    method: 'POST',
+                const response = await fetch(`${API_BASE_URL}/user`, {
+                    method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -78,7 +127,7 @@ const RegisterForm = ({ isVisible, onClose, onLog }) => {
 
                 if (response.ok) {
                     // 회원가입이 성공한 경우
-                    console.log('Registration successful:', result);
+                    console.log('Edit successful:', result);
 
                     // 여기에서 result에 있는 정보를 활용하여 필요한 작업을 수행할 수 있습니다.
                     const { success, user } = result;
@@ -87,12 +136,17 @@ const RegisterForm = ({ isVisible, onClose, onLog }) => {
                         console.log('Nickname:', user.nickname);
                         // 원하는 작업 수행
                     }
+                    localStorage.setItem('nickname', formData.nickname);
+                    localStorage.setItem('profileId', formData.profileId);
+                    localStorage.setItem('introduction', formData.introduction);
 
+                    navigate(`/userpage/${id}`);
                     onClose();
-                    onLog();
+                    window.location.reload();
+
                 } else {
                     // 회원가입이 실패한 경우
-                    console.log('Registration failed:', result);
+                    console.log('Edit failed:', result);
                     // 여기에서 적절한 에러 처리를 수행할 수 있습니다.
 
                     const newErrors = {};
@@ -114,7 +168,7 @@ const RegisterForm = ({ isVisible, onClose, onLog }) => {
                             case '닉네임은 3-16자만 사용 가능합니다.':
                                 newErrors.nickname = 'Nicknames can only contain 3-16 characters.';
                                 break;
-                            case '닉네임은 3-16자만 사용 가능합니다.':
+                            case '이미 존재하는 닉네임입니다.':
                                 newErrors.nickname = 'The nickname that already exists.';
                                 break;
                             default:
@@ -143,15 +197,67 @@ const RegisterForm = ({ isVisible, onClose, onLog }) => {
         });
     };
 
+    const handleImageChange = (e) => {
+        setOpenImages(!openImages);
+        setFormData({
+            ...formData,
+            profileId: e,
+        });
+    }
+
     return (
         <BackgroundOverlay isVisible={isVisible} onClick={onClose}>
-            <Card isVisible={isVisible} onClick={(e) => e.stopPropagation()} style={{ width: '40%' }}>
+            <Card isVisible={isVisible} onClick={(e) => e.stopPropagation()} style={{ width: '30%', minWidth: '400px', maxHeight: '80vh', overflowY: 'auto' }}>
                 <CardTitle tag="h6" className="border-bottom p-3 mb-0">
                     <i class="bi bi-pencil-square">  </i>
                     Edit Profile
                 </CardTitle>
                 <CardBody>
                     <Form>
+                        {!openImages && (
+                            <div className="d-flex flex-column justify-content-center align-items-center mb-3" style={{ height: '200px' }}>
+                                {/* <i class="bi bi-person-circle" style={{ fontSize: '150px' }}></i> */}
+                                <img src={userImages[formData.profileId]}
+                                    className="rounded-circle"
+                                    style={{ width: '180px', height: '180px' }}
+                                    onClick={() => setOpenImages(!openImages)}
+                                    alt="click and pick your profile image" />
+                            </div>
+                        )}
+
+                        {
+                            openImages && (
+                                <div className="d-flex flex-column justify-content-center align-items-center mb-3" style={{ height: '200px' }}>
+                                    <Row className="d-flex justify-content-center align-items-center mb-1 my-auto">
+                                        {userImages.slice(0, 3).map((userImage, index) => (
+                                            <Col key={index} lg="2">
+                                                <img
+                                                    src={userImage}
+                                                    className="rounded-circle me-2"
+                                                    style={{ width: '15%', minWidth: '50px' }}
+                                                    alt={`User ${index + 1}`}
+                                                    onClick={() => { handleImageChange(index) }}
+                                                />
+                                            </Col>
+                                        ))}
+                                    </Row>
+                                    <Row className="d-flex justify-content-center align-items-center mb-5 my-auto">
+                                        {userImages.slice(3, 6).map((userImage, index) => (
+                                            <Col key={index} lg="2">
+                                                <img
+                                                    src={userImage}
+                                                    className="rounded-circle"
+                                                    style={{ width: '15%', minWidth: '50px' }}
+                                                    alt={`User ${index + 1}`}
+                                                    onClick={() => { handleImageChange(index + 3) }}
+                                                />
+                                            </Col>
+                                        ))}
+                                    </Row>
+                                </div>
+                            )
+                        }
+
                         <FormGroup>
                             <Label for="userId">ID</Label>
                             <Input
@@ -161,6 +267,9 @@ const RegisterForm = ({ isVisible, onClose, onLog }) => {
                                 type="text"
                                 value={formData.userId}
                                 onChange={handleChange}
+                                readOnly={true}
+                                disabled={true}
+                                style={{ color: 'gray' }}
                             />
                             {errors.userId && <div className="text-danger">{errors.userId}</div>}
                         </FormGroup>
@@ -210,11 +319,7 @@ const RegisterForm = ({ isVisible, onClose, onLog }) => {
                                 onChange={handleChange}
                             />
                         </FormGroup>
-
-                        <FormGroup check>
-                            <Input type="checkbox" /> <Label check>Check me out</Label>
-                        </FormGroup>
-                        <Button onClick={handleSubmit} className="btn" color="secondary" style={{ width: '100%', marginTop: '10px', marginBottom: '10px' }}>Submit</Button>
+                        <Button onClick={handleSubmit} className="btn" color="secondary" style={{ width: '100%', marginTop: '10px', marginBottom: '10px' }}>Save</Button>
                     </Form>
                 </CardBody>
             </Card>
@@ -222,4 +327,4 @@ const RegisterForm = ({ isVisible, onClose, onLog }) => {
     );
 };
 
-export default RegisterForm;
+export default EditProfileForm;

@@ -37,7 +37,7 @@ const LogoutForm = ({ isVisible, onClose }) => {
         }
 
         navigate('/');
-        onClose()
+        onClose();
         window.location.reload();
     };
 
