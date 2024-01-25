@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { API_BASE_URL } from "../config";
 import { formatDateString } from "../dateUtils";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
     Card,
     CardImg,
@@ -32,6 +32,7 @@ const userImages = [user0, user1, user2, user3, user4, user5];
 
 const UserPage = () => {
     const { paramsid } = useParams();
+    const navigate = useNavigate();
     const id = localStorage.getItem('id');
     // const userId = localStorage.getItem('userId');
     // const nickname = localStorage.getItem('nickname');
@@ -87,6 +88,7 @@ const UserPage = () => {
     }
 
     useEffect(() => {
+        if (!id) navigate('/');
         fetchData();
     }, [paramsid])
 

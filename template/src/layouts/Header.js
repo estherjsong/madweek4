@@ -57,7 +57,8 @@ const Header = () => {
   const [notiColor, setNotiColor] = useState('secondary');
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async () => { 
+      if (!localStorage.getItem('id')) return;
       try {
         const response = await fetch(`${API_BASE_URL}/notification`, {
           method: 'GET',

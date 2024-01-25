@@ -8,9 +8,10 @@ import {
 } from "reactstrap";
 import { API_BASE_URL } from "../config";
 import { formatDateString } from "../dateUtils";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Notifications = () => {
+    const navigate = useNavigate();
     // For Dismiss Button with Alert
     const [visible, setVisible] = useState(true);
     const [alerts, setAlerts] = useState([]);
@@ -67,6 +68,9 @@ const Notifications = () => {
     }
 
     useEffect(() => {
+        if (!localStorage.getItem('id')) {
+            navigate('/');
+        }
         fetchData();
     }, [])
 

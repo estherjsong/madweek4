@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Row, Col, CardTitle, CardBody, Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
 import CodeMirror from '@uiw/react-codemirror';
 import { darcula } from '@uiw/codemirror-themes-all';
@@ -96,7 +96,7 @@ const Ask = () => {
                     if (!result) {
                         result = parse(stream.value);
                         console.log('Question post successful', result);
-                    } else if (stream.value) {
+                    } else if (formData.isRequestAI && stream.value) {
                         message += stream.value;
                         setAnswer(parse(message));
                     }
@@ -131,6 +131,12 @@ const Ask = () => {
             // 여기에서 적절한 에러 처리를 수행할 수 있습니다.
         }
     };
+
+    useEffect(() => {
+        if (!localStorage.getItem('id')) {
+            navigate('/');
+        }
+    }, []);
 
     return (
         <Row>
