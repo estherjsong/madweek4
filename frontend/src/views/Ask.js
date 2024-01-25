@@ -98,7 +98,10 @@ const Ask = () => {
                         console.log('Question post successful', result);
                     } else if (formData.isRequestAI && stream.value) {
                         message += stream.value;
-                        setAnswer(parse(message));
+                        if (message.includes('{')) {
+                            setAnswer(parse(message.substring(message.indexOf('{'))));
+                        }
+                        console.log(stream.value);
                     }
                     if (stream.done) {
                         navigate(`/detail/${result.id}`);
