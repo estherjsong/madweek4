@@ -63,6 +63,7 @@ const UserPage = () => {
                 console.log("questions from mypage", questions);
                 console.log("answers from mypage", answers);
                 console.log("toplanguages", topLanguages);
+                console.log(id, paramsid, id === paramsid)
             } else {
                 console.log('User information get failed:', result);
             }
@@ -74,7 +75,7 @@ const UserPage = () => {
 
     useEffect(() => {
         fetchData();
-    }, [])
+    }, [paramsid])
 
     return (
         <div>
@@ -112,14 +113,21 @@ const UserPage = () => {
                                 {introduction}
                             </CardText>
                         </CardBody>
-                        <Row className="justify-content-center mt-3 mb-5">
-                            <Col xs="auto">
-                                <Button outline color="primary">
-                                    <i className="bi bi-pencil me-3"></i>
-                                    Edit Profile
-                                </Button>
-                            </Col>
-                        </Row>
+                        {id === paramsid ? (
+                            <Row className="justify-content-center mt-3 mb-5">
+                                <Col xs="auto">
+                                    <Button outline color="primary">
+                                        <i className="bi bi-pencil me-3"></i>
+                                        Edit Profile
+                                    </Button>
+                                </Col>
+                            </Row>
+                        ) : (
+                            <div>
+
+                            </div>
+                        )}
+
                     </Card>
                 </Col>
                 <Col lg="8" style={{ overflowY: 'auto' }}>

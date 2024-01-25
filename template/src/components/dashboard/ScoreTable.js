@@ -1,5 +1,6 @@
 import { Card, CardBody, CardTitle, CardSubtitle, Table } from "reactstrap";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { API_BASE_URL } from "../../config";
 import user1 from "../../assets/images/users/user1.jpg";
 import user2 from "../../assets/images/users/user2.jpg";
@@ -118,7 +119,9 @@ const ScoreTables = () => {
                         height="45"
                       />
                       <div className="ms-3">
-                        <h6 className="mb-0">{tdata.nickname}</h6>
+                        <Link to={`/userpage/${tdata.id}`} className="nav-link">
+                          <h6 className="mb-0">{tdata.nickname}</h6>
+                        </Link>
                         {/* <span className="text-muted">{tdata.email}</span> */}
                       </div>
                     </div>
