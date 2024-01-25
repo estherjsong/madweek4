@@ -138,7 +138,8 @@ class QuestionController {
       );
 
       const tags = await tagRepository.findTagsByQuestionId(question.id);
-      await tagRepository.deleteQuestionTagsByTagIds(
+      await tagRepository.deleteQuestionTagsByQuestionIdAndTagIds(
+        data.id as number,
         tags
           .filter((tag) => !newTags.some((e) => tag.id === e.id))
           .map((tag) => tag.id)
@@ -169,7 +170,10 @@ class QuestionController {
     try {
       const question = await questionRepository.deleteQuestionById(data.id);
       const tags = await tagRepository.findTagsByQuestionId(question.id);
-      await tagRepository.deleteQuestionTagsByTagIds(tags.map((tag) => tag.id));
+      await tagRepository.deleteQuestionTagsByQuestionIdAndTagIds(
+        question.id,
+        tags.map((tag) => tag.id)
+      );
       return res.status(200).json({ ...question, tags });
     } catch (error) {
       next(error);

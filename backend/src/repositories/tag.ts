@@ -101,13 +101,19 @@ class TagRepository {
     return result;
   }
 
-  async deleteQuestionTagsByTagIds(
+  async deleteQuestionTagsByQuestionIdAndTagIds(
+    questionId: number,
     tagId: number[]
   ): Promise<schema.QuestionTag[] | null> {
     if (tagId.length === 0) return null;
     const result = await db
       .delete(schema.questionTags)
-      .where(inArray(schema.questionTags.tagId, tagId))
+      .where(
+        and(
+          eq(schema.questionTags.questionId, questionId),
+          inArray(schema.questionTags.tagId, tagId)
+        )
+      )
       .returning();
     return result;
   }
