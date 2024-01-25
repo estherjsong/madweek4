@@ -76,6 +76,8 @@ const Notifications = () => {
                 return <div>Your answer received a like!</div>;
             case "올리신 질문에 답변이 달렸습니다!":
                 return <div>Your question received an answer!</div>;
+            case "올리신 질문에 AI 답변이 달렸습니다!":
+                return <div>Your question received an AI generated answer!</div>;
             default:
                 return <div>{alert.content}</div>;
         }
@@ -96,7 +98,7 @@ const Notifications = () => {
                         {alerts.length > 0 && (
                             alerts.map((alert) => (
                                 <Alert key={alert.id} color="info" isOpen={visible} toggle={() => onDismiss(alert.id)}>
-                                    <Link to="/starter" className="nav-link">
+                                    <Link to={`/detail/${alert.redirect}`} className="nav-link">
                                         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                                             <span>
                                                 {renderAlertContent(alert)}
