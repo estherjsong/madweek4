@@ -152,26 +152,27 @@
 
 > 하단의 체크박스로 AI-generated 답변을 받을 것인지 말 것인지 선택할 수 있음
 > 
+![22](https://github.com/estherjsong/madweek4/assets/40757981/425631d6-1829-4482-b120-e7b081b6467a)
 
-![18](https://github.com/estherjsong/madweek4/assets/40757981/99f34347-19dd-4603-b459-ab220d2fd054)
 
 ## User Page
 
-![19](https://github.com/estherjsong/madweek4/assets/40757981/b6f9c5f7-b59f-475c-b6d4-d0f14982cf66)
+![18](https://github.com/estherjsong/madweek4/assets/40757981/99f34347-19dd-4603-b459-ab220d2fd054)
 
 > 좌측의 프로필 정보와 함께 우측에는 가장 많이 질문하고 답변한 세가지 언어를 확인할 수 있음
 > 
 
-![20](https://github.com/estherjsong/madweek4/assets/40757981/7586fef9-1576-440b-bcaa-185f09394c22)
+![19](https://github.com/estherjsong/madweek4/assets/40757981/b6f9c5f7-b59f-475c-b6d4-d0f14982cf66)
 
 > 그 아래로는 자신이 작성한 질문, 자신이 답변한 질문만 모아볼 수 있으며 클릭할 경우 해당 질문으로 바로 이동할 수 있음
 > 
 
-![21](https://github.com/estherjsong/madweek4/assets/40757981/5a2cd8e5-1123-4727-ac3b-fb6f30b04966)
+![20](https://github.com/estherjsong/madweek4/assets/40757981/7586fef9-1576-440b-bcaa-185f09394c22)
 
 > Edit Profile 버튼을 눌러 아이디 이외의 사용자 정보를 수정할 수 있음
 > 
 
+![21](https://github.com/estherjsong/madweek4/assets/40757981/5a2cd8e5-1123-4727-ac3b-fb6f30b04966)
 
 > Question Page 등에서 사용자 닉네임을 눌러 타인의 프로필 역시 확인할 수 있으며 이 경우엔 프로필 수정 버튼이 보이지 않음
 >
