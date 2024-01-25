@@ -49,7 +49,6 @@ class UserService {
       .default('')
       .trim()
       .isString()
-      .notEmpty()
       .run(req);
   }
 }
