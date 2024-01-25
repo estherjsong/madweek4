@@ -174,8 +174,8 @@ const Questions = () => {
                             <thead>
                                 <tr>
                                     <th className="col-md-1"> # </th>
-                                    <th className="col-md-7"> Question </th>
-                                    <th className="col-md-4"> Answers </th>
+                                    <th className="col-md-9"> Question </th>
+                                    <th className="col-md-2"> Answers </th>
                                 </tr>
                             </thead>
                             <tbody>
