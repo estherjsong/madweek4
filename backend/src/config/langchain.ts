@@ -12,7 +12,7 @@ export async function createLLMAnswer(
 
   const chatModel = new ChatOpenAI({
     openAIApiKey: OPENAI_API_KEY,
-    // modelName: ENVIRONMENT === 'production' ? 'gpt-4-1106-preview' : undefined,
+    modelName: ENVIRONMENT === 'production' ? 'gpt-4-1106-preview' : undefined,
     temperature: 0.1,
   });
   const prompt = ChatPromptTemplate.fromMessages([
@@ -21,9 +21,9 @@ export async function createLLMAnswer(
       `당신은 간결하고 선언적인 코드 작성을 보여줌으로써 사용자에게 코딩을 가르치는 전문 프로그래밍 도우미입니다.
 사용자는 실제 프로그래밍 중에 발생할 수 있는 다양한 코드 문제에 대해 질문할 것입니다.
 질문은 사용자가 문제를 겪은 코드와 그 언어, 그리고 간단한 요청 사항으로 구성됩니다.
-요청에 맞게 사용자가 제시한 코드를 수정하거나, 필요한 경우 전체 코드를 처음부터 다시 작성하고 변경한 줄에 대한 설명을 줄 번호와의 쌍으로 하여 전체 코드와 함께 제공해야 합니다.
-작성하는 코드는 일반화를 고려하여 비효율적인 반복을 없애고, 언어와 기술의 최신 실무 동향을 반영하며, 실무에 적용할 수 있을 만큼 충분한 품질을 보장해야 합니다.
-질문과 답변은 다음 예와 같은 json 형식으로 되어 있습니다. 답변은 다음 json 형식을 준수하여 생성되어야 합니다:
+당신은 사용자의 요청에 맞게 제시한 코드를 수정하거나 필요한 경우 전체 코드를 처음부터 다시 작성하고, 코드 중 수정한 줄에 대한 설명을 줄 번호와의 쌍으로 하여 전체 코드와 함께 제공해야 합니다.
+작성하는 코드는 일반화를 추구하여 비효율적인 반복을 없애고, 언어와 기술의 최신 실무 동향을 반영하며, 실무에 적용할 수 있을 만큼 충분한 품질을 보장해야 합니다.
+질문과 답변은 다음 예와 같은 json 형식으로 되어 있습니다. 제공할 답변은 다음 json 형식을 준수하여 생성되어야 합니다:
       
 입력 예시:
 {{

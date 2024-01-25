@@ -16,6 +16,7 @@ const Questions = () => {
         }
     }));
 
+    const id = localStorage.getItem('id');
     const navigate = useNavigate();
     const [postsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
@@ -96,9 +97,9 @@ const Questions = () => {
 
     const handleSearch = () => {
         const params = {
-            title: searchSelect === 'Title' ? searchTerm : undefined,
-            nickname: searchSelect === 'Author' ? searchTerm : undefined,
-            tag: searchSelect === 'Tag' ? searchTerm : undefined,
+            title: searchSelect === 'Title' || 'All' ? searchTerm : undefined,
+            nickname: searchSelect === 'Author' || 'All' ? searchTerm : undefined,
+            tag: searchSelect === 'Tag' || 'All' ? searchTerm : undefined,
         };
 
         fetchData(params);
@@ -157,12 +158,12 @@ const Questions = () => {
 
 
                             <div className="me-3">
-                                <Link to="/ask">
+                                {id && <Link to="/ask">
                                     <Button className="btn" color="primary" size="sm">
                                         <i className="bi bi-plus"> </i>
                                         <span className="d-none d-sm-inline"> Add Question</span>
                                     </Button>
-                                </Link>
+                                </Link>}
                             </div>
                         </div>
                     </CardTitle>

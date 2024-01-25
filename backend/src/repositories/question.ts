@@ -7,6 +7,7 @@ import {
   getTableColumns,
   ilike,
   inArray,
+  or,
 } from 'drizzle-orm';
 
 import db from '@config/db';
@@ -83,7 +84,7 @@ class QuestionRepository {
       })
       .from(schema.questions)
       .innerJoin(schema.users, eq(schema.questions.userId, schema.users.id))
-      .where(and(...conditions))
+      .where(or(...conditions))
       .orderBy(desc(schema.questions.createdAt))
       .limit(limit)
       .offset(offset)

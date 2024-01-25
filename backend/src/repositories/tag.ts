@@ -7,6 +7,7 @@ import {
   getTableColumns,
   ilike,
   inArray,
+  or,
 } from 'drizzle-orm';
 
 import db from '@config/db';
@@ -67,7 +68,7 @@ class TagRepository {
         count: count(schema.questionTags),
       })
       .from(schema.tags)
-      .where(and(...conditions))
+      .where(or(...conditions))
       .leftJoin(
         schema.questionTags,
         eq(schema.tags.id, schema.questionTags.tagId)

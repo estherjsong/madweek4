@@ -489,7 +489,7 @@ const Detail = () => {
                                             {/* <i className="bi bi-chevron-left me-2"></i> */}
                                             # {index + 1} &nbsp; Answer by {answer.user.nickname}
                                         </div>
-                                        {parseInt(id) !== answer.userId && <div>
+                                        {id && parseInt(id) !== answer.userId && <div>
                                             {renderLikeButton(answer.id, 1)}
                                             <small>{answer.like}</small>
                                             {renderLikeButton(answer.id, -1)}
@@ -693,7 +693,7 @@ const Detail = () => {
                             ))}
                         </div>
                         {
-                            (parseInt(id) !== post.userId && !answersList.some((answer) => answer.userId === parseInt(id))) &&
+                            (id && parseInt(id) !== post.userId && !answersList.some((answer) => answer.userId === parseInt(id))) &&
                                 <Card id={`answerCard_newAnswerCard`}>
                                     <CardTitle tag="h6" className="border-bottom p-1 mb-0 d-flex justify-content-between">
                                         <div className='p-2'>

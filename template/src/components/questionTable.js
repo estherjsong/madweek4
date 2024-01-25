@@ -5,7 +5,7 @@ import Loader from "../layouts/loader/Loader";
 import TagShow from "../components/TagShow";
 
 const QuestionsTable = ({ listName, questionList, addShow = true, postsPerPage = 5, showPagination = true, goto = false }) => {
-    const navigate = useNavigate()
+    const id = localStorage.getItem('id');
     const [currentPage, setCurrentPage] = useState(1);
     const [currentPosts, setCurrentPosts] = useState([]);
     const [indexOfLast, setIndexOfLast] = useState(1);
@@ -47,14 +47,15 @@ const QuestionsTable = ({ listName, questionList, addShow = true, postsPerPage =
                                 {addShow && (
                                     <div className="d-flex align-items-center">
                                         {/* Add the grid classes to control the width of elements */}
-                                        <div className="me-3">
-                                            <Link to="/ask">
-                                                <Button className="btn" color="primary" size="sm">
-                                                    <i className="bi bi-plus"> </i>
-                                                    <span className="d-none d-sm-inline"> Add Question</span>
-                                                </Button>
-                                            </Link>
-                                        </div>
+                                            {id && <div className="me-3">
+                                                <Link to="/ask">
+                                                    <Button className="btn" color="primary" size="sm">
+                                                        <i className="bi bi-plus"> </i>
+                                                        <span className="d-none d-sm-inline"> Add Question</span>
+                                                    </Button>
+                                                </Link>
+                                            </div>
+                                            }
                                     </div>
                                 )}
 
