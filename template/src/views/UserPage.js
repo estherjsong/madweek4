@@ -160,7 +160,7 @@ const UserPage = () => {
                     <Row>
                         {/* <h5 className="mb-3 mt-3">My Questions</h5> */}
                         <Col lg="12">
-                            <QuestionsTable listName={'My Questions'} questionList={questions} />
+                            <QuestionsTable listName={'My Questions'} questionList={questions} addShow={true}/>
                         </Col>
                     </Row>
 
@@ -179,7 +179,7 @@ const UserPage = () => {
                             </Card>
                         </Col> */}
                         <Col lg="12">
-                            <QuestionsTable listName={'My Answers'} questionList={answers.map((item) => item.question)} />
+                            <QuestionsTable listName={'My Answers'} questionList={answers.map((item) => item.question)} addShow={false} />
                         </Col>
                     </Row>
                 </Col>
