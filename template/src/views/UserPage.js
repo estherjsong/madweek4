@@ -179,7 +179,7 @@ const UserPage = () => {
                     <Row>
                         {/* <h5 className="mb-3 mt-3">My Questions</h5> */}
                         <Col lg="12">
-                            <QuestionsTable listName={'My Questions'} questionList={questions} addShow={true} />
+                            <QuestionsTable listName={'My Questions'} questionList={questions} />
                         </Col>
                     </Row>
 

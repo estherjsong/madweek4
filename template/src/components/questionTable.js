@@ -4,9 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import Loader from "../layouts/loader/Loader";
 import TagShow from "../components/TagShow";
 
-const QuestionsTable = ({ listName, questionList, addShow }) => {
-    const navigate = useNavigate();
-    const postsPerPage = 5;
+const QuestionsTable = ({ listName, questionList, addShow = true, postsPerPage = 5, showPagination = true, goto = false }) => {
+    const navigate = useNavigate()
     const [currentPage, setCurrentPage] = useState(1);
     const [currentPosts, setCurrentPosts] = useState([]);
     const [indexOfLast, setIndexOfLast] = useState(1);
@@ -19,6 +18,7 @@ const QuestionsTable = ({ listName, questionList, addShow }) => {
         console.log("questionList from question Table", questionList);
         setIndexOfLast(currentPage * postsPerPage);
         setIndexOfFirst(indexOfLast - postsPerPage);
+        console.log(indexOfFirst, indexOfLast);
         setCurrentPosts(questionList.slice(indexOfFirst, indexOfLast));
         console.log("currentPosts", questionList, indexOfFirst, indexOfLast, currentPosts);
         setLoading(false);
@@ -65,8 +65,8 @@ const QuestionsTable = ({ listName, questionList, addShow }) => {
                                     <thead>
                                         <tr>
                                             <th className="col-md-1"> # </th>
-                                            <th className="col-md-7"> Question </th>
-                                            <th className="col-md-4"> Answers </th>
+                                            <th className="col-md-9"> Question </th>
+                                            <th className="col-md-2"> Answers </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -113,30 +113,43 @@ const QuestionsTable = ({ listName, questionList, addShow }) => {
                                     </tbody>
                                 </Table>
 
-                                <div>
-                                    {/* Pagination */}
-                                    <Pagination>
-                                        <PaginationItem>
-                                            <PaginationLink first onClick={() => handlePageChange(1)} />
-                                        </PaginationItem>
-                                        <PaginationItem>
-                                            <PaginationLink previous onClick={() => handlePageChange(currentPage - 1)} />
-                                        </PaginationItem>
-                                        {Array.from({ length: totalPages }, (_, index) => (
-                                            <PaginationItem key={index + 1} active={index + 1 === currentPage}>
-                                                <PaginationLink onClick={() => handlePageChange(index + 1)}>
-                                                    {index + 1}
-                                                </PaginationLink>
+                                {showPagination && (
+                                    <div>
+                                        {/* Pagination */}
+                                        <Pagination>
+                                            <PaginationItem>
+                                                <PaginationLink first onClick={() => handlePageChange(1)} />
                                             </PaginationItem>
-                                        ))}
-                                        <PaginationItem>
-                                            <PaginationLink next onClick={() => handlePageChange(currentPage + 1)} />
-                                        </PaginationItem>
-                                        <PaginationItem>
-                                            <PaginationLink last onClick={() => handlePageChange(totalPages)} />
-                                        </PaginationItem>
-                                    </Pagination>
-                                </div>
+                                            <PaginationItem>
+                                                <PaginationLink previous onClick={() => handlePageChange(currentPage - 1)} />
+                                            </PaginationItem>
+                                            {Array.from({ length: totalPages }, (_, index) => (
+                                                <PaginationItem key={index + 1} active={index + 1 === currentPage}>
+                                                    <PaginationLink onClick={() => handlePageChange(index + 1)}>
+                                                        {index + 1}
+                                                    </PaginationLink>
+                                                </PaginationItem>
+                                            ))}
+                                            <PaginationItem>
+                                                <PaginationLink next onClick={() => handlePageChange(currentPage + 1)} />
+                                            </PaginationItem>
+                                            <PaginationItem>
+                                                <PaginationLink last onClick={() => handlePageChange(totalPages)} />
+                                            </PaginationItem>
+                                        </Pagination>
+                                    </div>
+                                )}
+
+                                {goto && (
+                                    <div className="d-flex justify-content-end">
+                                        <Link to={'/questions'}>
+                                            <Button outline size="sm">
+                                                See All Questions
+                                                <i className="bi bi-arrow-right ms-1"></i>
+                                            </Button>
+                                        </Link>
+                                    </div>
+                                )}
                             </CardBody>
                         </Card>
                     </Col>
