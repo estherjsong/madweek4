@@ -1,5 +1,7 @@
 # madweek4
-![자산 7hor_logo_blue.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/7f592094-fa2d-482d-be3d-9ca71504eb99/%EC%9E%90%EC%82%B0_7hor_logo_blue.png)
+
+![자산 7hor_logo_blue](https://github.com/estherjsong/madweek4/assets/40757981/16af10d3-7f6e-489a-864d-9f5fa4267a5e)
+
 
 # CoAI
 
