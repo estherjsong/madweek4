@@ -2,11 +2,13 @@ import { Card, CardBody, CardTitle, CardSubtitle, Table } from "reactstrap";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { API_BASE_URL } from "../../config";
+import user0 from "../../assets/images/users/user0.jpg";
 import user1 from "../../assets/images/users/user1.jpg";
 import user2 from "../../assets/images/users/user2.jpg";
 import user3 from "../../assets/images/users/user3.jpg";
 import user4 from "../../assets/images/users/user4.jpg";
 import user5 from "../../assets/images/users/user5.jpg";
+const userImages = [user0, user1, user2, user3, user4, user5];
 
 const tableData = [
   {
@@ -112,7 +114,7 @@ const ScoreTables = () => {
                   <td>
                     <div className="d-flex align-items-center p-2">
                       <img
-                        src={tdata.avatar}
+                        src={userImages[tdata.profileId]}
                         className="rounded-circle"
                         alt="avatar"
                         width="45"
