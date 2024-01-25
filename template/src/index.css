@@ -11,3 +11,12 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+@font-face {
+  font-family: "HackBold";
+  src: url("./fonts/Hack-Bold.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Franlest";
+  src: url("./fonts/Franlest-Dreaming-BF641924f8ca49b.otf") format("truetype");
+}

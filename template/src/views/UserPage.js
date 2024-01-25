@@ -93,7 +93,7 @@ const UserPage = () => {
     return (
         <div>
             <Row>
-                <Col lg="4" style={{ position: 'sticky', top: '0', maxHeight: '100vh', overflowY: 'auto' }}>
+                <Col lg="4" style={{ position: 'sticky', top: '0', maxHeight: '100vh'}}>
                     <Card body className="text-center">
                         <CardTitle tag="h4" className="mt-3">
                             {id === paramsid ? (
