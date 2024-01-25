@@ -1,5 +1,5 @@
 import logger from '@utils/logger';
-import { ENVIRONMENT, OPENAI_API_KEY } from '@utils/secret';
+import { OPENAI_API_KEY } from '@utils/secret';
 
 export async function createLLMAnswer(
   language: string,
@@ -55,7 +55,9 @@ export async function createLLMAnswer(
   const input = JSON.stringify({ language, request, code });
 
   logger.info(
-    'An AI response request was received with the following input: ' + input
+    chatModel.modelName +
+      ' response request was received with the following input: ' +
+      input
   );
 
   return await chain.stream({ input });
