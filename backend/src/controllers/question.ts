@@ -107,8 +107,7 @@ class QuestionController {
         tags.map((tag) => tag.id)
       );
 
-      // 사용량 깎이므로 일단 막아놓음 내 돈...
-      if (data.isRequestAI && false) {
+      if (data.isRequestAI) {
         await questionService.pipelineAIAnswer(question, tags, res);
       } else {
         res.status(201).json({ ...question, tags });

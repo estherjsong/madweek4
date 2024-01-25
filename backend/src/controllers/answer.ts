@@ -91,7 +91,7 @@ class AnswerController {
         .then((question) => {
           void notificationRepository.createNotification(
             '올리신 질문에 답변이 달렸습니다!',
-            '',
+            question.id.toString(),
             question.userId
           );
         });
@@ -229,7 +229,7 @@ class AnswerController {
       if (like.like === 1 && (prev == null || prev.like !== 1)) {
         void notificationRepository.createNotification(
           '올리신 답변에 좋아요가 달렸습니다!',
-          '',
+          answer.questionId.toString(),
           answer.userId
         );
       }
