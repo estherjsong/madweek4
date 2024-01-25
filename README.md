@@ -1,4 +1,4 @@
-# madweek4
+# CoAI
 
 ![자산 7hor_logo_blue](https://github.com/estherjsong/madweek4/assets/40757981/16af10d3-7f6e-489a-864d-9f5fa4267a5e)
 
