@@ -1,9 +1,9 @@
 import { Row, Col, Table, Card, CardTitle, CardBody, Pagination, PaginationItem, PaginationLink, Button, Input, InputGroup, ButtonDropdown, Dropdown, DropdownToggle, DropdownItem, DropdownMenu } from "reactstrap";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from 'axios';
 import { formatDateString } from "../dateUtils";
 import TagShow from "../components/TagShow";
+import { API_BASE_URL } from "../config";
 
 const Questions = () => {
     // Dummy data for questions
@@ -50,12 +50,19 @@ const Questions = () => {
             if (params.tag) baseParams.tag = params.tag;
 
             // Send a GET request with the constructed parameters
-            const response = await axios.get(`/question`, { params: baseParams });
+            const response = await fetch(`${API_BASE_URL}/question?${new URLSearchParams(baseParams)}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include'
+            });
+            const result = await response.json();
 
             // Set the fetched posts to the state
             console.log(response);
-            setPosts(response.data.questions);
-            setTotalPages(Math.ceil(response.data.count / postsPerPage));
+            setPosts(result.questions);
+            setTotalPages(Math.ceil(result.count / postsPerPage));
         } catch (error) {
             console.error('Error fetching data:', error);
         }

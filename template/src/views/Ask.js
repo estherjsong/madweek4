@@ -11,6 +11,7 @@ import TagsInput from 'react-tagsinput'; // Import the react-tagsinput component
 import { API_BASE_URL } from '../config';
 import language from './languages.json';
 import { useNavigate } from 'react-router-dom';
+import { parse } from 'partial-json';
 
 const Ask = () => {
     const navigate = useNavigate();
@@ -23,6 +24,7 @@ const Ask = () => {
         isRequestAI: false,
     });
     const [errors, setErrors] = useState({});
+    const [answer, setAnswer] = useState({});
 
     const handleLanguageChange = (e) => {
         setLangSelect(e.target.value)
@@ -64,6 +66,8 @@ const Ask = () => {
         e.preventDefault();
         // Perform additional logic or send data to server
 
+        if (answer.code) return;
+
         setFormData({
             ...formData,
             tags: [{ name: langSelect, type: 1 }],
@@ -80,15 +84,30 @@ const Ask = () => {
                 credentials: 'include',
                 body: JSON.stringify(formData),
             })
-            const result = await response.json();
-
-            console.log("response", response)
+            console.log('response', response);
 
             if (response.ok) {
-                navigate('/questions')
-                console.log('Qeustion post successful', result);
+                const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+                let result;
+                let message = '';
+
+                while (true) {
+                    const stream = await reader.read();
+                    if (!result) {
+                        result = parse(stream.value);
+                        console.log('Question post successful', result);
+                    } else if (stream.value) {
+                        message += stream.value;
+                        setAnswer(parse(message));
+                    }
+                    if (stream.done) {
+                        navigate(`/detail/${result.id}`);
+                        break;
+                    }
+                }
             } else {
-                console.log('Qeustion post failed:', result);
+                const result = await response.json();
+                console.log('Question post failed:', result);
                 const newErrors = {};
                 result.errors.forEach((error) => {
                     // error.msg에 따라 각각의 처리
@@ -115,7 +134,7 @@ const Ask = () => {
 
     return (
         <Row>
-            <Col>
+            {!answer.code ? <Col>
                 <Card>
                     <CardTitle tag="h6" className="border-bottom p-3 mb-0">
                         <i className="bi bi-bell me-2"> </i>
@@ -188,7 +207,31 @@ const Ask = () => {
                         </Form>
                     </CardBody>
                 </Card>
-            </Col>
+            </Col> :
+                <Col>
+                    <Card>
+                        <CardTitle tag="h6" className="border-bottom p-3 mb-0">
+                            <i className="bi bi-robot me-2"> </i>
+                            AI Answer
+                        </CardTitle>
+                        <CardBody>
+                            <CodeMirror
+                                id="code"
+                                value={answer.code}
+                                onChange={handleChange}
+                                theme={darcula}
+                                minHeight={'300px'}
+                                lang={formData.tags[0].name}
+                                extensions={[loadLanguage(langSelect)]}
+                                readOnly={true}
+                            >
+                            </CodeMirror>
+                            <strong className='p-2 d-block'>Comments</strong>
+                            {answer.comments && answer.comments.map((comment) => <p className='p-1'>{`Line ${comment.line}: ${comment.description || ''}`}</p>)}
+                        </CardBody>
+                    </Card>
+                </Col>
+            }
         </Row>
     );
 };

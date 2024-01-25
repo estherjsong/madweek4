@@ -13,7 +13,6 @@ import { API_BASE_URL } from '../config';
 import language from './languages.json';
 import { EditorView } from '@codemirror/view';
 import { EditorState } from '@codemirror/state';
-import axios from 'axios';
 import Loader from '../layouts/loader/Loader';
 import { formatDateString } from '../dateUtils';
 import './animation.css'
@@ -21,8 +20,6 @@ import TagShow from '../components/TagShow';
 
 const Detail = () => {
     const id = localStorage.getItem('id');
-    console.log("userid", id)
-
     const { questionId } = useParams();
     const [post, setPost] = useState();
     const [loading, setLoading] = useState(true); // Track loading state
@@ -273,10 +270,18 @@ const Detail = () => {
 
     const fetchAnswers = async () => {
         try {
-            const response = await axios.get(`/answer/${questionId}`);
-            setAnswersList(response.data);
-            console.log("fetchComments", response.data);
-            response.data.forEach((answer, index) => {
+            const response = await fetch(`${API_BASE_URL}/answer/${questionId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include'
+            });
+            const result = await response.json();
+
+            setAnswersList(result);
+            console.log("fetchComments", result);
+            result.forEach((answer, index) => {
                 const codeString = answer.code || '';
                 const lines = (codeString.match(/\n/g) || []).length + 1;
                 updateLineCount(index, lines);
@@ -294,9 +299,17 @@ const Detail = () => {
         // Define your function to fetch data
         const fetchData = async () => {
             try {
-                const response = await axios.get(`/question/${questionId}`);
-                setPost(response.data);
-                console.log(response.data);
+                const response = await fetch(`${API_BASE_URL}/question/${questionId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include'
+                });
+                const result = await response.json();
+
+                setPost(result);
+                console.log(result);
                 // console.log(typeof id, typeof post.userId, parseInt(id)===post.userId)
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -323,7 +336,8 @@ const Detail = () => {
                 },
                 credentials: 'include',
             })
-            console.log(response.data);
+            const result = await response.json();
+            console.log(result);
             // console.log(typeof id, typeof post.userId, parseInt(id)===post.userId)
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -342,7 +356,7 @@ const Detail = () => {
                 credentials: 'include',
             })
             const result = await response.json();
-            console.log(response.data);
+            console.log(result);
 
             if (response.ok) {
                 console.log('Answer delete successful', result);
@@ -389,9 +403,9 @@ const Detail = () => {
             {loading ? (
                 <Loader />
             ) : (
-                <Row>
+                <Row style={{maxWidth: '1000px', }}>
                     <Col lg="12">
-                        <Card style={{ maxWidth: '1210px', overflowX: 'auto' }}>
+                        <Card style={{ overflowX: 'auto' }}>
                             <CardTitle tag="h6" className="border-bottom p-1 mb-0 d-flex justify-content-between flex-column flex-sm-row">
                                 <div className="p-2">
                                     <i className="bi bi-chevron-left me-2" onClick={handleGoBack}></i>
@@ -471,20 +485,24 @@ const Detail = () => {
                                     <CardTitle tag="h6" className="border-bottom p-1 mb-0 d-flex justify-content-between">
                                         <div className='p-2'>
                                             {/* <i className="bi bi-chevron-left me-2"></i> */}
-                                            # {index + 1} &nbsp; Answer
+                                            # {index + 1} &nbsp; Answer by {answer.user.nickname}
                                         </div>
                                         <div>
-                                            {renderLikeButton(answer.id, -1)}
-                                            {answer.like}
                                             {renderLikeButton(answer.id, 1)}
+                                            <small>{answer.like}</small>
+                                            {renderLikeButton(answer.id, -1)}
+                                        </div>
+                                        <div className='p-2'>
+                                            <small>{`${formatDateString(answer.createdAt)} `}</small>
                                         </div>
                                     </CardTitle>
                                     <CardBody>
                                         {editableStates[index] ? (
                                             <Row>
-                                                <Col sm="7" lg="8" xl="8" xxl="8">
+                                                <Col>
                                                     <CodeMirror
                                                         className='mb-3'
+                                                        style={{ position: 'relative' }}
                                                         ref={codeMirrorRef2}
                                                         theme={darcula}
                                                         minHeight={'150px'}
@@ -498,22 +516,20 @@ const Detail = () => {
                                                                 }
                                                             }),
                                                         ]}
-                                                    />
-                                                </Col>
-                                                <Col sm="5" lg="4" xl="4" xxl="4" className="d-flex flex-column">
-                                                    {Array.from({ length: editLineCount }, (_, index) => index + 1).map((lineNumber) => (
-                                                        <div>
+                                                    >
+                                                        {Array.from({ length: editLineCount }, (_, index) => index + 1).map((lineNumber) => (
+                                                            <div style={{ position: 'absolute', top: (lineNumber - 1) * 22.5, right: 0, zIndex: 1 }}>
                                                             <Button
-                                                                className={`btn-hover ${editSelectedLine === lineNumber ? 'selected' : ''}`}
+                                                                className={`btn-hover ${editSelectedLine === lineNumber ? 'selected' : ''} ${Array.from(editComments).some(comment => comment.line === lineNumber) ? 'show' : ''}`}
                                                                 outline
                                                                 color='black'
                                                                 id={`PopoverEditClick_${lineNumber}`}
                                                                 key={lineNumber}
                                                                 onClick={() => handleEditButtonClick(lineNumber)}
                                                             >
-                                                                <i className="bi bi-plus"> </i>
+                                                                <i className={`bi bi-${Array.from(editComments).some(comment => comment.line === lineNumber) ? 'pencil-square' : 'plus'}`}> </i>
                                                             </Button>
-                                                            <span>{Array.from(editComments).find(comment => comment.line === lineNumber)?.description}</span>
+                                                            <span></span>
                                                             <UncontrolledPopover
                                                                 placement="right"
                                                                 target={`PopoverEditClick_${lineNumber}`}
@@ -549,11 +565,21 @@ const Detail = () => {
 
                                                                                 if (existingCommentIndex !== -1) {
                                                                                     // If a comment for the lineNumber already exists, update its description
-                                                                                    updatedComments[existingCommentIndex].description = description;
+                                                                                    if (description.length === 0) {
+                                                                                        updatedComments.splice(existingCommentIndex);
+                                                                                        console.log(updatedComments);
+                                                                                    } else {
+                                                                                        updatedComments[existingCommentIndex].description = description;
+                                                                                    }
                                                                                 } else {
                                                                                     // If there's no comment for the lineNumber, create a new comment
-                                                                                    updatedComments.push({ line: lineNumber, description: description });
+                                                                                    if (description.length > 0) {
+                                                                                        updatedComments.push({ line: lineNumber, description: description });
+                                                                                    }
                                                                                 }
+
+                                                                                setEditSelectedLine(0);
+                                                                                setDescription('');
 
                                                                                 return updatedComments;
                                                                             });
@@ -565,13 +591,15 @@ const Detail = () => {
                                                             </UncontrolledPopover>
                                                         </div>
                                                     ))}
+                                                    </CodeMirror>
                                                 </Col>
                                             </Row>
                                         ) : (
                                             <Row>
-                                                <Col sm="7" lg="8" xl="8" xxl="8">
+                                                <Col>
                                                     <CodeMirror
                                                         className='mb-3'
+                                                        style={{ position: 'relative' }}
                                                         id="code"
                                                         value={answer.code}
                                                         theme={darcula}
@@ -581,56 +609,58 @@ const Detail = () => {
                                                             EditorView.editable.of(false),
                                                             EditorState.readOnly.of(true),
                                                         ]}
-                                                    />
-                                                </Col>
-                                                <Col sm="5" lg="4" xl="4" xxl="4" className="d-flex flex-column">
-                                                    {Array.from({ length: lineCounts[index] || 0 }, (_, lineNumber) => (
-                                                        <div>
-                                                            <Button
-                                                                className={`btn-hover ${lookingLines[index] === lineNumber ? 'selected' : ''} ${!answer.comments.find(comment => comment.line === lineNumber + 1)?.description ? 'hidden' : ''}`}
-                                                                outline
-                                                                color='black'
-                                                                id={`LookingClick_${index}${lineNumber}`}
-                                                                key={lineNumber}
-                                                                onClick={() => setLookingLine(index, lineNumber)}
-                                                            >
-                                                                <i className="bi bi-chevron-right"> </i>
-                                                            </Button>
-                                                            {document.getElementById(`LookingClick_${index}${lineNumber}`) && (
-                                                                <UncontrolledPopover
-                                                                    placement="right"
-                                                                    target={`LookingClick_${index}${lineNumber}`}
-                                                                    trigger="legacy"
-                                                                    isOpen={lookingLines[index] === parseInt(lineNumber)}
-                                                                    style={{ backgroundColor: 'white', borderRadius: '10px' }}
+                                                        >
+                                                        {Array.from({ length: lineCounts[index] || 0 }, (_, lineNumber) => (
+                                                            <div style={{ position: 'absolute', top: lineNumber * 22.5, right: 0, zIndex: 1 }}>
+                                                                <Button
+                                                                    className={`btn-hover ${lookingLines[index] === lineNumber ? 'selected' : ''} ${!answer.comments.find(comment => comment.line === lineNumber + 1)?.description ? 'hidden' : ''} show`}
+                                                                    outline
+                                                                    color='black'
+                                                                    id={`LookingClick_${index}${lineNumber}`}
+                                                                    key={lineNumber}
+                                                                    onClick={() => setLookingLine(index, lineNumber)}
                                                                 >
-                                                                    <PopoverBody className="d-flex">
-                                                                        {/* Assuming answersData is an array containing objects with properties line and content */}
-                                                                        {answer.comments.find(comment => comment.line === lineNumber + 1)?.description}
-                                                                    </PopoverBody>
-                                                                </UncontrolledPopover>
-                                                            )}
-                                                        </div>
-                                                    ))}
+                                                                    <i className="bi bi-chevron-right"> </i>
+                                                                </Button>
+                                                                {document.getElementById(`LookingClick_${index}${lineNumber}`) && (
+                                                                    <UncontrolledPopover
+                                                                        placement="right"
+                                                                        target={`LookingClick_${index}${lineNumber}`}
+                                                                        trigger="legacy"
+                                                                        isOpen={lookingLines[index] === parseInt(lineNumber)}
+                                                                        style={{ backgroundColor: 'white', borderRadius: '10px' }}
+                                                                    >
+                                                                        <PopoverBody className="d-flex">
+                                                                            {/* Assuming answersData is an array containing objects with properties line and content */}
+                                                                            {answer.comments.find(comment => comment.line === lineNumber + 1)?.description}
+                                                                        </PopoverBody>
+                                                                    </UncontrolledPopover>
+                                                                )}
+                                                            </div>
+                                                        ))}
+                                                    </CodeMirror>
                                                 </Col>
                                             </Row>
                                         )}
 
                                         <Col xs='auto' className='ms-auto'>
-                                            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                                            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                                                 {(parseInt(id) === answer.userId) ? (
                                                     <div>
                                                         {editableStates[index] ? (
                                                             <Button className="btn me-1" color="primary" size="sm" onClick={() => { handleAnswerEdit(answer.id); toggleEditable(index); }}>
                                                                 <i className="bi bi-check2"> </i>
+                                                                저장
                                                             </Button>
                                                         ) : (
                                                             <Button className="btn me-1" color="primary" size="sm" onClick={() => { setEditCode(answer.code); setEditComments(answer.comments); setEditLineCount((answer.code.match(/\n/g) || []).length + 1); toggleEditable(index); }}>
                                                                 <i className="bi bi-pencil-square"> </i>
+                                                                수정
                                                             </Button>
                                                         )}
                                                         <Button className="btn" size="sm" onClick={ansToggle} color="danger">
                                                             <i className="bi bi-trash"> </i>
+                                                            삭제
                                                         </Button>
                                                     </div>
                                                 ) : (
@@ -638,10 +668,6 @@ const Detail = () => {
                                                     </div>
                                                 )
                                                 }
-                                                <div className="d-flex flex-column">
-                                                    <small className="text-muted ms-auto">{formatDateString(answer.createdAt)}</small>
-                                                    <small className="text-muted ms-auto">{answer.user.nickname}</small>
-                                                </div>
                                             </div>
 
                                         </Col>
@@ -664,106 +690,108 @@ const Detail = () => {
                                 </Card>
                             ))}
                         </div>
-
-                        <Card id={`answerCard_newAnswerCard`}>
-                            <CardTitle tag="h6" className="border-bottom p-1 mb-0 d-flex justify-content-between">
-                                <div className='p-2'>
-                                    <i className="bi bi-plus me-2"> </i>
-                                    New Answer
-                                </div>
-                                <Button className="btn me-2" color="primary" size="sm"
-                                    onClick={handleAnswerPost}>
-                                    post
-                                </Button>
-                            </CardTitle>
-                            <CardBody>
-                                <Row>
-                                    <Col sm="7" lg="8" xl="8" xxl="8">
-                                        <CodeMirror
-                                            ref={codeMirrorRef}
-                                            theme={darcula}
-                                            minHeight={'150px'}
-                                            onChange={handleChange}
-                                            extensions={[
-                                                loadLanguage(post.tags[0].name),
-                                                EditorView.updateListener.of((update) => {
-                                                    if (update.docChanged) {
-                                                        setLineCount(update.state.doc.lines);
-                                                    }
-                                                }),
-                                            ]}
-                                        />
-                                    </Col>
-                                    <Col sm="5" lg="4" xl="4" xxl="4" className="d-flex flex-column">
-                                        {Array.from({ length: lineCount }, (_, index) => index + 1).map((lineNumber) => (
-                                            <div>
-                                                <Button
-                                                    className={`btn-hover ${selectedLine === lineNumber ? 'selected' : ''}`}
-                                                    outline
-                                                    color='black'
-                                                    id={`PopoverClick_${lineNumber}`}
-                                                    key={lineNumber}
-                                                    onClick={() => handleButtonClick(lineNumber)}
-                                                >
-                                                    <i className="bi bi-plus"> </i>
-                                                </Button>
-                                                <span>{Array.from(comments).find(comment => comment.line === lineNumber)?.description}</span>
-                                                <UncontrolledPopover
-                                                    placement="right"
-                                                    target={`PopoverClick_${lineNumber}`}
-                                                    trigger="legacy"
-                                                    isOpen={selectedLine === parseInt(lineNumber)}
-                                                    style={{ backgroundColor: 'white', borderRadius: '10px' }}
-                                                >
-                                                    <PopoverBody className="d-flex">
-                                                        {/* Assuming answersData is an array containing objects with properties line and content */}
-                                                        <Input
-                                                            id="title"
-                                                            name="title"
-                                                            placeholder="with a placeholder"
-                                                            type="textarea"
-                                                            style={{ minHeight: '100px', marginRight: '10px' }}
-                                                            value={description}
-                                                            onChange={(e) => {
-                                                                setDescription(e.target.value);
-                                                            }}
-                                                        />
+                        {
+                            (parseInt(id) !== post.userId) &&
+                                <Card id={`answerCard_newAnswerCard`}>
+                                    <CardTitle tag="h6" className="border-bottom p-1 mb-0 d-flex justify-content-between">
+                                        <div className='p-2'>
+                                            <i className="bi bi-plus me-2"> </i>
+                                            New Answer
+                                        </div>
+                                        <Button className="btn me-2" color="primary" size="sm"
+                                            onClick={handleAnswerPost}>
+                                            post
+                                        </Button>
+                                    </CardTitle>
+                                    <CardBody>
+                                        <Row>
+                                            <Col sm="7" lg="8" xl="8" xxl="8">
+                                                <CodeMirror
+                                                    ref={codeMirrorRef}
+                                                    theme={darcula}
+                                                    minHeight={'150px'}
+                                                    onChange={handleChange}
+                                                    extensions={[
+                                                        loadLanguage(post.tags[0].name),
+                                                        EditorView.updateListener.of((update) => {
+                                                            if (update.docChanged) {
+                                                                setLineCount(update.state.doc.lines);
+                                                            }
+                                                        }),
+                                                    ]}
+                                                />
+                                            </Col>
+                                            <Col sm="5" lg="4" xl="4" xxl="4" className="d-flex flex-column">
+                                                {Array.from({ length: lineCount }, (_, index) => index + 1).map((lineNumber) => (
+                                                    <div>
                                                         <Button
-                                                            style={{
-                                                                backgroundColor: 'transparent',
-                                                                color: 'black',
-                                                                borderColor: 'transparent',
-                                                                width: '30px', // 버튼의 너비 조정 (조절 가능)
-                                                                padding: '0',
-                                                            }}
-                                                            onClick={() => {
-                                                                setComments((prevComments) => {
-                                                                    const updatedComments = [...prevComments];
-                                                                    const existingCommentIndex = updatedComments.findIndex(comment => comment.line === lineNumber);
-
-                                                                    if (existingCommentIndex !== -1) {
-                                                                        // If a comment for the lineNumber already exists, update its description
-                                                                        updatedComments[existingCommentIndex].description = description;
-                                                                    } else {
-                                                                        // If there's no comment for the lineNumber, create a new comment
-                                                                        updatedComments.push({ line: lineNumber, description: description });
-                                                                    }
-
-                                                                    return updatedComments;
-                                                                });
-                                                                console.log(comments)
-                                                            }}
+                                                            className={`btn-hover ${selectedLine === lineNumber ? 'selected' : ''}`}
+                                                            outline
+                                                            color='black'
+                                                            id={`PopoverClick_${lineNumber}`}
+                                                            key={lineNumber}
+                                                            onClick={() => handleButtonClick(lineNumber)}
                                                         >
-                                                            <i className="bi bi-check-circle-fill"></i>
+                                                            <i className="bi bi-plus"> </i>
                                                         </Button>
-                                                    </PopoverBody>
-                                                </UncontrolledPopover>
-                                            </div>
-                                        ))}
-                                    </Col>
-                                </Row>
-                            </CardBody>
-                        </Card>
+                                                        <span>{Array.from(comments).find(comment => comment.line === lineNumber)?.description}</span>
+                                                        <UncontrolledPopover
+                                                            placement="right"
+                                                            target={`PopoverClick_${lineNumber}`}
+                                                            trigger="legacy"
+                                                            isOpen={selectedLine === parseInt(lineNumber)}
+                                                            style={{ backgroundColor: 'white', borderRadius: '10px' }}
+                                                        >
+                                                            <PopoverBody className="d-flex">
+                                                                {/* Assuming answersData is an array containing objects with properties line and content */}
+                                                                <Input
+                                                                    id="title"
+                                                                    name="title"
+                                                                    placeholder="with a placeholder"
+                                                                    type="textarea"
+                                                                    style={{ minHeight: '100px', marginRight: '10px' }}
+                                                                    value={description}
+                                                                    onChange={(e) => {
+                                                                        setDescription(e.target.value);
+                                                                    }}
+                                                                />
+                                                                <Button
+                                                                    style={{
+                                                                        backgroundColor: 'transparent',
+                                                                        color: 'black',
+                                                                        borderColor: 'transparent',
+                                                                        width: '30px', // 버튼의 너비 조정 (조절 가능)
+                                                                        padding: '0',
+                                                                    }}
+                                                                    onClick={() => {
+                                                                        setComments((prevComments) => {
+                                                                            const updatedComments = [...prevComments];
+                                                                            const existingCommentIndex = updatedComments.findIndex(comment => comment.line === lineNumber);
+
+                                                                            if (existingCommentIndex !== -1) {
+                                                                                // If a comment for the lineNumber already exists, update its description
+                                                                                updatedComments[existingCommentIndex].description = description;
+                                                                            } else {
+                                                                                // If there's no comment for the lineNumber, create a new comment
+                                                                                updatedComments.push({ line: lineNumber, description: description });
+                                                                            }
+
+                                                                            return updatedComments;
+                                                                        });
+                                                                        console.log(comments)
+                                                                    }}
+                                                                >
+                                                                    <i className="bi bi-check-circle-fill"></i>
+                                                                </Button>
+                                                            </PopoverBody>
+                                                        </UncontrolledPopover>
+                                                    </div>
+                                                ))}
+                                            </Col>
+                                        </Row>
+                                    </CardBody>
+                                </Card>
+                        }
 
                         <Modal isOpen={modal} toggle={toggle}>
                             <ModalHeader toggle={toggle}>Question Deletion</ModalHeader>
