@@ -37,14 +37,16 @@ class UserService {
         }
       })
       .run(req);
-    await body('profileId', '프로필은 1부터 5 중에 하나여야 합니다.')
+    await body('profileId', '프로필은 0부터 5 중에 하나여야 합니다.')
       .optional()
-      .default(1)
+      .default(0)
       .isInt()
       .toInt()
-      .isIn([1, 2, 3, 4, 5])
+      .isIn([0, 1, 2, 3, 4, 5])
       .run(req);
     await body('introduction', '자기소개를 작성하셔야 합니다.')
+      .optional()
+      .default('')
       .trim()
       .isString()
       .notEmpty()

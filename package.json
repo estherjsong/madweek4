@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npm install && npm run build --workspaces --if-present",
+    "build": "npm install && npm run build -w backend",
     "start": "npm run start -w backend"
   },
   "author": "",

@@ -23,10 +23,12 @@
     "react-scripts": "5.0.1",
     "react-tagsinput": "^3.20.3",
     "reactstrap": "9.2.0",
+    "serve": "^14.2.1",
     "styled-components": "^6.1.8",
     "web-vitals": "2.1.4"
   },
   "scripts": {
+    "serve": "serve -l 80 -s build",
     "start": "set HTTPS=true&&set SSL_CRT_FILE=.cert.pem&&set SSL_KEY_FILE=key.pem&&react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
