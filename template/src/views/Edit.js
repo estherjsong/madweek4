@@ -11,7 +11,6 @@ import 'react-tagsinput/react-tagsinput.css'; // Import the styles for react-tag
 import TagsInput from 'react-tagsinput'; // Import the react-tagsinput component
 import { API_BASE_URL } from '../config';
 import language from './languages.json';
-import axios from 'axios';
 
 const Edit = () => {
     const navigate = useNavigate();
@@ -48,14 +47,22 @@ const Edit = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`/question/${questionId}`);
-                console.log(response.data);
+                const response = await fetch(`${API_BASE_URL}/question/${questionId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include'
+                });
+                const result = await response.json();
+
+                console.log(result);
                 setFormData({
-                    title: response.data.title,
-                    code: response.data.code,
-                    tags: response.data.tags,
+                    title: result.title,
+                    code: result.code,
+                    tags: result.tags,
                 })
-                setLangSelect(response.data.tags[0].name)
+                setLangSelect(result.tags[0].name)
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
