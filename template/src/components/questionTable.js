@@ -72,7 +72,11 @@ const QuestionsTable = ({ listName, questionList }) => {
                                             currentPosts && currentPosts.map((data) => (
                                                 <tr key={data.id}>
                                                     <th scope="row">{data.id}</th>
-                                                    <td style={{ maxHeight: '50px', overflow: 'hidden' }}>
+                                                    <td style={{
+                                                        maxHeight: '50px',
+                                                        overflow: 'hidden',
+                                                        maxWidth: '200px', // Set a maximum width for the cell
+                                                    }}>
                                                         <Link to={`/detail/${data.id}`} className='mb-3' style={{
                                                             textDecoration: 'none',
                                                             color: 'inherit',
@@ -80,7 +84,17 @@ const QuestionsTable = ({ listName, questionList }) => {
                                                             display: 'flex',
                                                             flexDirection: 'column',
                                                         }}>
-                                                            <span>{data.title}</span>
+                                                            <span
+                                                                style={{
+                                                                    whiteSpace: 'nowrap',
+                                                                    textOverflow: 'ellipsis',
+                                                                    overflow: 'hidden',
+                                                                    display: 'block',
+                                                                }}
+                                                                title={data.title}
+                                                            >
+                                                                {data.title}
+                                                            </span>
                                                         </Link>
                                                         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                                                             <div>

@@ -25,6 +25,7 @@ import { API_BASE_URL } from "../config";
 // const Header = ({ isLoggedIn, onLogout }) => {
 const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const id = localStorage.getItem('id');
 
   useEffect(() => {
     // Check the authentication status when the component mounts
@@ -177,7 +178,7 @@ const Header = () => {
             {isLoggedIn && (
               <>
                 <DropdownItem header>Info</DropdownItem>
-                <Link to={'/mypage'} style={{ textDecoration: 'none' }}>
+                <Link to={`/userpage/${id}`} style={{ textDecoration: 'none' }}>
                   <DropdownItem>My Account</DropdownItem>
                 </Link>
                 <DropdownItem>Edit Profile</DropdownItem>

@@ -22,7 +22,7 @@ import Bronze from "../assets/images/Bronze.png"
 import user1 from "../assets/images/users/user4.jpg";
 import { formatDateString } from "../dateUtils";
 
-const MyPage = () => {
+const UserPage = () => {
     const id = localStorage.getItem('id');
     const userId = localStorage.getItem('userId');
     const nickname = localStorage.getItem('nickname');
@@ -175,4 +175,4 @@ const MyPage = () => {
     )
 }
 
-export default MyPage;
+export default UserPage;
